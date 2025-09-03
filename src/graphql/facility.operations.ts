@@ -77,3 +77,53 @@ export const UPDATE_INCIDENT_STATUS = gql`
   }
 `;
 
+export const GET_FACILITY_ANALYTICS = gql`
+  query GetFacilityAnalytics($facilityId: ID!, $dateRange: DateRangeInput) {
+    facilityAnalytics(facilityId: $facilityId, dateRange: $dateRange) {
+      totalIncidents
+      resolvedIncidents
+      averageResponseTime
+      bedUtilization {
+        total
+        occupied
+        available
+        rate
+      }
+      ambulanceUtilization {
+        total
+        active
+        available
+        rate
+      }
+      departmentMetrics {
+        departmentId
+        name
+        caseload
+        averageWaitTime
+      }
+    }
+  }
+`;
+
+export const GET_NEARBY_FACILITIES = gql`
+  query GetNearbyFacilities($location: LocationInput!, $radius: Float!, $facilityType: FacilityType) {
+    nearbyFacilities(location: $location, radius: $radius, facilityType: $facilityType) {
+      id
+      name
+      facilityType
+      location {
+        latitude
+        longitude
+        address
+      }
+      contactInfo {
+        phone
+        emergencyPhone
+      }
+      currentOccupancy
+      occupancyRate
+      acceptsEmergencies: status
+      distance
+    }
+  }
+`;

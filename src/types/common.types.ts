@@ -52,14 +52,51 @@ export interface Dispatch {
 }
 
 export interface FacilityUpdate {
-
+  facility: {
+    id: string;
+    currentOccupancy: number;
+    occupancyRate: number;
+    bedManagement: Array<{
+      id: string;
+      bedNumber: string;
+      status: string;
+      updatedAt: string;
+    }>;
+    ambulanceFleet: Array<{
+      id: string;
+      unitNumber: string;
+      status: string;
+      currentLocation?: Location;
+    }>;
+  };
+  updateType: 'CREATED' | 'UPDATED' | 'DELETED';
+  timestamp: string;
 }
 
 export interface IncidentUpdate {
-    
+  incident: {
+    id: string;
+    incidentNumber: string;
+    severity: string;
+    status: string;
+    estimatedArrival?: string;
+    assignments: Array<{
+      id: string;
+      status: string;
+    }>;
+  };
+  updateType: 'CREATED' | 'UPDATED' | 'DELETED';
+  timestamp: string;
 }
 export type ResourceStatus = 
   | 'AVAILABLE' 
   | 'LOW_STOCK' 
   | 'OUT_OF_STOCK' 
   | 'EXPIRED';
+
+// Generic subscription data wrapper
+export interface SubscriptionData<T = any> {
+  data: T;
+  updateType: 'CREATED' | 'UPDATED' | 'DELETED';
+  timestamp: string;
+}

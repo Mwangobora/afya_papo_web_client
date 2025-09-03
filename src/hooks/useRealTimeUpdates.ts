@@ -5,7 +5,7 @@ import {
   INCIDENT_UPDATES,
   INCOMING_PATIENT_ALERTS,
 } from '../graphql/subscriptions';
-import type{ FacilityUpdate, IncidentUpdate } from '../types/common.types';
+import type { FacilityUpdate, IncidentUpdate } from '../types/common.types';
 
 interface UseRealTimeUpdatesOptions {
   facilityId: string;

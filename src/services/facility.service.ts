@@ -1,8 +1,13 @@
 import { apolloClient } from '../config/apollo.config';
 import {
   GET_FACILITY_DASHBOARD,
-  
+  UPDATE_INCIDENT_STATUS,
 } from '../graphql/facility.operations'
+import {
+  BED_STATUS,
+  DISPATCH_AMBULANCE,
+  UPDATE_RESOURCE_QUANTITY,
+} from '../graphql/subscriptions'
 import type{
   Facility,
   BedManagement,
@@ -34,7 +39,7 @@ export class FacilityService {
   ): Promise<ApiResponse<BedManagement>> {
     try {
       const { data } = await apolloClient.mutate({
-        mutation: UPDATE_BED_STATUS,
+        mutation: BED_STATUS,
         variables: {
           input: {
             bedId,

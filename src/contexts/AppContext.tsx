@@ -78,10 +78,10 @@ export const useNotifications = (): NotificationContextType => {
 };
 
 // src/components/rbac/ProtectedComponent.tsx
-import React, { ReactNode } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { usePermissions } from '../../hooks/usePermissions';
-import { UserType, AdminPermissions } from '../../types/auth.types';
+import type { ReactNode } from 'react';
+import { useAuth } from './AuthContext';
+import { usePermissions } from '../hooks/usePermission';
+import type{ UserType, AdminPermissions } from '../types/auth.types'
 
 interface ProtectedComponentProps {
   children: ReactNode;

@@ -1,10 +1,19 @@
 // src/services/incident.service.ts
 import { apolloClient } from '../config/apollo.config';
-import {GET_ACTIVE_INCIDENTS} from '../graphql/incident.operations';
+import {
+  GET_ACTIVE_INCIDENTS,
+  CREATE_INCIDENT,
+} from '../graphql/incident.operations';
+import { UPDATE_INCIDENT_STATUS } from '../graphql/facility.operations';
 
-import type { PaginatedResponse } from '../types/auth.types';
-
-import type {Incident,IncidentType,SeverityLevel,IncidentStatus} from '../types/incident.types';
+import type { PaginatedResponse, ApiResponse } from '../types/auth.types';
+import type {
+  Incident,
+  IncidentType,
+  SeverityLevel,
+  IncidentStatus,
+} from '../types/incident.types';
+import type { Location } from '../types/common.types';
 
 interface IncidentFilters {
   status?: IncidentStatus[];
@@ -16,15 +25,15 @@ interface IncidentFilters {
   };
 }
 
-// interface CreateIncidentInput {
-//   incidentType: IncidentType;
-//   severity: SeverityLevel;
-//   location: Location;
-//   patientCount: number;
-//   patientAge?: number;
-//   symptoms?: string;
-//   description?: string;
-// }
+interface CreateIncidentInput {
+  incidentType: IncidentType;
+  severity: SeverityLevel;
+  location: Location;
+  patientCount: number;
+  patientAge?: number;
+  symptoms?: string;
+  description?: string;
+}
 
 export class IncidentService {
   async getActiveIncidents(
@@ -69,65 +78,115 @@ export class IncidentService {
     }
   }
 
-//   async createIncident(input: CreateIncidentInput): Promise<ApiResponse<Incident>> {
-//     try {
-//       const { data } = await apolloClient.mutate({
-//         mutation: CREATE_INCIDENT,
-//         variables: { input },
-//         errorPolicy: 'all',
-//       });
+  async createIncident(input: CreateIncidentInput): Promise<ApiResponse<Incident>> {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: CREATE_INCIDENT,
+        variables: { input },
+        errorPolicy: 'all',
+      });
 
-//       const result = data?.createIncident;
+      const result = data?.createIncident;
 
-//       return {
-//         success: result?.success || false,
-//         data: result?.incident,
-//         errors: result?.errors,
-//       };
-//     } catch (error) {
-//       console.error('Error creating incident:', error);
-//       return {
-//         success: false,
-//         errors: [{ message: 'Failed to create incident' }],
-//       };
-//     }
-//   }
+      return {
+        success: result?.success || false,
+        data: result?.incident,
+        errors: result?.errors,
+      };
+    } catch (error) {
+      console.error('Error creating incident:', error);
+      return {
+        success: false,
+        errors: [{ message: 'Failed to create incident' }],
+      };
+    }
+  }
 
-//   async updateIncidentStatus(
-//     incidentId: string,
-//     status: IncidentStatus,
-//     notes?: string
-//   ): Promise<ApiResponse<Incident>> {
-//     try {
-//       const { data } = await apolloClient.mutate({
-//         mutation: UPDATE_INCIDENT_STATUS,
-//         variables: {
-//           input: {
-//             incidentId,
-//             status,
-//             notes,
-//           },
-//         },
-//         errorPolicy: 'all',
-//       });
+  async updateIncidentStatus(
+    incidentId: string,
+    status: IncidentStatus,
+    notes?: string
+  ): Promise<ApiResponse<Incident>> {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_INCIDENT_STATUS,
+        variables: {
+          input: {
+            incidentId,
+            status,
+            notes,
+          },
+        },
+        errorPolicy: 'all',
+      });
 
-//       const result = data?.updateIncidentStatus;
+      const result = data?.updateIncidentStatus;
 
-//       return {
-//         success: result?.success || false,
-//         data: result?.incident,
-//         errors: result?.errors,
-//       };
-//     } catch (error) {
-//       console.error('Error updating incident status:', error);
-//       return {
-//         success: false,
-//         errors: [{ message: 'Failed to update incident status' }],
-//       };
-//     }
-//   }
-// }
+      return {
+        success: result?.success || false,
+        data: result?.incident,
+        errors: result?.errors,
+      };
+    } catch (error) {
+      console.error('Error updating incident status:', error);
+      return {
+        success: false,
+        errors: [{ message: 'Failed to update incident status' }],
+      };
+    }
+  }
 
+  async getIncidentById(incidentId: string): Promise<Incident | null> {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_ACTIVE_INCIDENTS,
+        variables: {
+          filters: { id: incidentId },
+        },
+        errorPolicy: 'all',
+        fetchPolicy: 'network-only',
+      });
 
+      const incidents = data?.incidents?.data;
+      return incidents?.[0] || null;
+    } catch (error) {
+      console.error('Error fetching incident by ID:', error);
+      return null;
+    }
+  }
 
+  async getIncidentsByStatus(
+    facilityId: string,
+    status: IncidentStatus[]
+  ): Promise<Incident[]> {
+    try {
+      const response = await this.getActiveIncidents(facilityId, { status });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching incidents by status:', error);
+      return [];
+    }
+  }
 
+  async searchIncidents(
+    facilityId: string,
+    searchTerm: string,
+    filters?: IncidentFilters
+  ): Promise<Incident[]> {
+    try {
+      const response = await this.getActiveIncidents(facilityId, {
+        ...filters,
+        // Add search functionality when backend supports it
+      });
+      
+      // Client-side filtering for now
+      return response.data.filter(incident =>
+        incident.incidentNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        incident.symptoms?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    } catch (error) {
+      console.error('Error searching incidents:', error);
+      return [];
+    }
+  }
+}

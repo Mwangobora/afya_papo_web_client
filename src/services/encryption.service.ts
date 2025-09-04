@@ -1,5 +1,5 @@
 export class EncryptionService {
-  private static readonly SECRET_KEY = process.env.REACT_APP_ENCRYPTION_KEY || 'default-secret-key';
+  private static readonly SECRET_KEY = import.meta.env.VITE_ENCRYPTION_KEY || 'default-secret-key';
 
   static encrypt(data: string): string {
     try {

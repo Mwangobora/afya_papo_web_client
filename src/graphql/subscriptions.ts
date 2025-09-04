@@ -1,22 +1,64 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
+export const INCIDENT_UPDATES = gql`
+  subscription IncidentUpdates($incidentId: ID!) {
+    incidentUpdates(incidentId: $incidentId) {
+      incident {
+        id
+        incidentNumber
+        status
+        severity
+        location {
+          latitude
+          longitude
+        }
+        assignments {
+          id
+          status
+          responder {
+            profile {
+              fullName
+            }
+            emergencyResponderProfile {
+              responderType
+              currentLocation {
+                latitude
+                longitude
+              }
+            }
+          }
+          estimatedTravelTime
+        }
+        timeline {
+          eventType
+          description
+          timestamp
+          updatedBy {
+            profile {
+              fullName
+            }
+          }
+        }
+      }
+      updateType
+      message
+      timestamp
+    }
+  }
+`;
 
 export const FACILITY_UPDATES = gql`
   subscription FacilityUpdates($facilityId: ID!) {
     facilityUpdates(facilityId: $facilityId) {
-      updateType
-      timestamp
       facility {
         id
+        name
         currentOccupancy
         occupancyRate
-        lastUpdated
         bedManagement {
           id
           bedNumber
-          bedType
           status
-          patientAge
           updatedAt
         }
         ambulanceFleet {
@@ -27,80 +69,54 @@ export const FACILITY_UPDATES = gql`
             latitude
             longitude
           }
-          currentDispatch {
-            eta
-            status
-          }
         }
       }
-    }
-  }
-`;
-
-export const INCIDENT_UPDATES = gql`
-  subscription IncidentUpdates($facilityId: ID!) {
-    incidentUpdates(facilityId: $facilityId) {
       updateType
       timestamp
-      incident {
-        id
-        incidentNumber
-        severity
-        status
-        estimatedArrival
-        patientCount
-        assignments {
-          id
-          status
-          responder {
-            id
-            fullName
-          }
-        }
-        dispatchedAmbulances {
-          id
-          unitNumber
-          status
-        }
-      }
     }
   }
 `;
 
-export const INCOMING_PATIENT_ALERTS = gql`
-  subscription IncomingPatientAlerts($facilityId: ID!) {
-    incomingPatients(facilityId: $facilityId) {
-      timestamp
-      alert {
-        urgency
-        message
-        estimatedArrival
-      }
-      incident {
+export const ASSIGNMENT_NOTIFICATIONS = gql`
+  subscription AssignmentNotifications($userId: ID!) {
+    assignmentNotifications(userId: $userId) {
+      assignment {
         id
-        incidentNumber
-        severity
-        incidentType
-        patientCount
-        patientAge
-        symptoms
-        location {
-          latitude
-          longitude
-          address
-        }
-        assignments {
-          responder {
-            fullName
-            responderType
+        incident {
+          incidentNumber
+          incidentType
+          severity
+          location {
+            latitude
+            longitude
           }
-          status
+          description
+          patientCount
         }
-        dispatchedAmbulances {
-          unitNumber
-          equipmentLevel
-        }
+        estimatedDistance
+        estimatedTravelTime
+        responseDeadline
       }
+      notificationType
+      message
+      timestamp
+    }
+  }
+`;
+
+export const EMERGENCY_ALERTS = gql`
+  subscription EmergencyAlerts($filters: AlertFiltersInput) {
+    emergencyAlerts(filters: $filters) {
+      alertType
+      severity
+      message
+      affectedArea {
+        regions
+        districts
+      }
+      instructions
+      timestamp
+      expiresAt
     }
   }
 `;
@@ -108,18 +124,21 @@ export const INCOMING_PATIENT_ALERTS = gql`
 export const BED_UPDATES = gql`
   subscription BedUpdates($facilityId: ID!) {
     bedUpdates(facilityId: $facilityId) {
-      updateType
-      timestamp
       bed {
         id
         bedNumber
         bedType
         status
+        hasOxygen
+        hasVentilator
+        hasMonitoring
         patientAge
         admissionType
         estimatedDischarge
         updatedAt
       }
+      updateType
+      timestamp
     }
   }
 `;
@@ -127,8 +146,6 @@ export const BED_UPDATES = gql`
 export const AMBULANCE_UPDATES = gql`
   subscription AmbulanceUpdates($facilityId: ID!) {
     ambulanceUpdates(facilityId: $facilityId) {
-      updateType
-      timestamp
       ambulance {
         id
         unitNumber
@@ -137,14 +154,11 @@ export const AMBULANCE_UPDATES = gql`
           latitude
           longitude
         }
-        currentDispatch {
-          incident {
-            incidentNumber
-          }
-          eta
-          status
-        }
+        lastLocationUpdate
+        isOperational
       }
+      updateType
+      timestamp
     }
   }
 `;

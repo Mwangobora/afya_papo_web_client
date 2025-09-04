@@ -7,24 +7,73 @@ import type { Resource } from "./common.types";
 export interface Facility {
   id: string;
   name: string;
-  facilityType: FacilityType;
-  region: string;
-  district: string;
+  facilityType: FacilityTypeInfo;
+  registrationNumber: string;
+  
+  // Location
+  region: Region;
+  district: District;
   location: Location;
-  contactInfo: ContactInfo;
+  address: string;
+  
+  // Capacity
   bedCapacity: number;
   emergencyBeds: number;
   icuBeds: number;
   currentOccupancy: number;
   occupancyRate: number;
-  status: FacilityStatus;
-  departments: Department[];
+  
+  // Contact
+  phoneNumber: string;
+  emergencyPhone: string;
+  email?: string;
+  
+  // Capabilities
+  acceptsEmergencies: boolean;
+  hasEmergencyRoom: boolean;
+  hasSurgery: boolean;
+  hasICU: boolean;
+  hasMaternity: boolean;
+  
+  // Real-time data
   bedManagement: BedManagement[];
+  departments: Department[];
   ambulanceFleet: Ambulance[];
-  inventory: Resource[];
-  isOperational: boolean;
-  lastUpdated: string;
-  facilityUpdate: string
+  
+  // Current status
+  isActive: boolean;
+  
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface FacilityTypeInfo {
+  name: string;
+  category: FacilityType;
+}
+
+export interface Region {
+  id: string;
+  name: string;
+  nameSw: string;
+  code: string;
+  capital: string;
+  centerPoint: Location;
+  population?: number;
+  areaKm2?: number;
+  isActive: boolean;
+}
+
+export interface District {
+  id: string;
+  region: Region;
+  name: string;
+  nameSw: string;
+  code: string;
+  centerPoint: Location;
+  population?: number;
+  areaKm2?: number;
+  isActive: boolean;
 }
 
 export interface BedManagement {
@@ -32,63 +81,92 @@ export interface BedManagement {
   bedNumber: string;
   bedType: BedType;
   status: BedStatus;
+  
+  // Equipment
   hasOxygen: boolean;
   hasVentilator: boolean;
   hasMonitoring: boolean;
+  
+  // Patient info (if occupied)
   patientAge?: number;
   admissionType?: string;
   estimatedDischarge?: string;
+  
   updatedAt: string;
 }
 
 export interface Ambulance {
   id: string;
   unitNumber: string;
-  status: AmbulanceStatus;
-  equipmentLevel: EquipmentLevel;
+  
+  // Facility association
+  facility: Facility;
+  
+  // Vehicle information
   make: string;
   model: string;
   year: number;
+  licensePlate: string;
+  chassisNumber?: string;
+  
+  // Equipment and capabilities
+  equipmentLevel: EquipmentLevel;
+  patientCapacity: number;
+  medicalEquipment: string[];
+  
+  // Current status and location
+  status: AmbulanceStatus;
   currentLocation?: Location;
-  currentDispatch?: Dispatch;
-  currentCrew: CrewMember[];
+  lastLocationUpdate?: string;
+  
+  // Maintenance and compliance
+  lastInspection?: string;
+  nextMaintenance?: string;
+  insuranceExpiry?: string;
   isOperational: boolean;
-  lastMaintenance: string;
+  
+  // Performance metrics
+  totalDispatches: number;
+  totalTransports: number;
+  averageResponseTimeMinutes: number;
+  
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type FacilityType = 
-  | 'HOSPITAL' 
-  | 'HEALTH_CENTER' 
-  | 'CLINIC' 
-  | 'DISPENSARY';
+  | 'HOSPITAL'
+  | 'HEALTH_CENTER'
+  | 'DISPENSARY'
+  | 'CLINIC';
 
 export type BedType = 
-  | 'GENERAL' 
-  | 'ICU' 
-  | 'EMERGENCY' 
-  | 'PEDIATRIC' 
-  | 'MATERNITY';
+  | 'GENERAL'
+  | 'EMERGENCY'
+  | 'ICU'
+  | 'MATERNITY'
+  | 'PEDIATRIC';
 
 export type BedStatus = 
-  | 'AVAILABLE' 
-  | 'OCCUPIED' 
-  | 'MAINTENANCE' 
+  | 'AVAILABLE'
+  | 'OCCUPIED'
+  | 'MAINTENANCE'
   | 'RESERVED';
 
 export type AmbulanceStatus = 
-  | 'AVAILABLE' 
-  | 'DISPATCHED' 
-  | 'EN_ROUTE' 
-  | 'ON_SCENE' 
-  | 'TRANSPORTING' 
-  | 'OUT_OF_SERVICE';
+  | 'AVAILABLE'
+  | 'DISPATCHED'
+  | 'EN_ROUTE'
+  | 'ON_SCENE'
+  | 'TRANSPORTING'
+  | 'AT_HOSPITAL'
+  | 'OUT_OF_SERVICE'
+  | 'MAINTENANCE';
 
 export type EquipmentLevel = 
-  | 'BLS' 
-  | 'ALS' 
-  | 'CRITICAL_CARE';
-
-export type FacilityStatus = 
-  | 'OPERATIONAL' 
-  | 'MAINTENANCE' 
-  | 'EMERGENCY_ONLY';
+  | 'BASIC'
+  | 'INTERMEDIATE'
+  | 'ADVANCED'
+  | 'CRITICAL_CARE'
+  | 'NEONATAL'
+  | 'SPECIALIZED';

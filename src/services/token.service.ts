@@ -8,7 +8,7 @@ export class TokenService {
   private static readonly EXPIRES_AT_KEY = 'afyapapo_expires_at';
   
   private static readonly COOKIE_OPTIONS = {
-    secure: process.env.NODE_ENV === 'production',
+    secure: import.meta.env.PROD,
     sameSite: 'strict' as const,
     path: '/',
   };

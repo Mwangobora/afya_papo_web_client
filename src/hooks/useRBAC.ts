@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { RBACService } from '../services/rbac.service';
 import type { UserType, AdminPermissions } from '../types/auth.types';
 

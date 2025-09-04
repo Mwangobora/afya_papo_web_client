@@ -1,44 +1,41 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const GET_FACILITY_DASHBOARD = gql`
   query GetFacilityDashboard($facilityId: ID!) {
-    facility(id: $facilityId) {
+    hospital(id: $facilityId) {
       id
       name
-      facilityType
-      region
-      district
+      facilityType {
+        name
+        category
+      }
+      registrationNumber
+      region {
+        name
+        code
+      }
+      district {
+        name
+        code
+      }
       location {
         latitude
         longitude
         address
-        region
-        district
       }
-      contactInfo {
-        phone
-        email
-        emergencyPhone
-      }
+      phoneNumber
+      emergencyPhone
+      email
       bedCapacity
       emergencyBeds
       icuBeds
       currentOccupancy
       occupancyRate
-      status
-      isOperational
-      lastUpdated
-      departments {
-        id
-        name
-        acceptsEmergencies
-        currentCaseload
-        availableStaff
-        headOfDepartment {
-          id
-          fullName
-        }
-      }
+      acceptsEmergencies
+      hasEmergencyRoom
+      hasSurgery
+      hasICU
+      hasMaternity
       bedManagement {
         id
         bedNumber
@@ -52,52 +49,46 @@ export const GET_FACILITY_DASHBOARD = gql`
         estimatedDischarge
         updatedAt
       }
+      departments {
+        id
+        name
+        acceptsEmergencies
+        currentCaseload
+        availableStaff
+        headOfDepartment {
+          id
+          profile {
+            fullName
+          }
+        }
+      }
       ambulanceFleet {
         id
         unitNumber
-        status
-        equipmentLevel
         make
         model
         year
+        licensePlate
+        equipmentLevel
+        patientCapacity
+        medicalEquipment
+        status
         currentLocation {
           latitude
           longitude
         }
-        currentDispatch {
-          id
-          incident {
-            id
-            incidentNumber
-          }
-          eta
-          status
-          dispatchedAt
-        }
-        currentCrew {
-          id
-          responder {
-            id
-            fullName
-            responderType
-          }
-          role
-          isActive
-        }
+        lastLocationUpdate
+        lastInspection
+        nextMaintenance
+        insuranceExpiry
         isOperational
-        lastMaintenance
+        totalDispatches
+        totalTransports
+        averageResponseTimeMinutes
       }
-      inventory {
-        id
-        name
-        category
-        currentQuantity
-        minimumQuantity
-        unit
-        expirationDate
-        status
-        lastUpdated
-      }
+      isActive
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -105,25 +96,17 @@ export const GET_FACILITY_DASHBOARD = gql`
 export const UPDATE_BED_STATUS = gql`
   mutation UpdateBedStatus($input: UpdateBedStatusInput!) {
     updateBedStatus(input: $input) {
-      success
-      bed {
-        id
-        bedNumber
-        bedType
-        status
-        hasOxygen
-        hasVentilator
-        hasMonitoring
-        patientAge
-        admissionType
-        estimatedDischarge
-        updatedAt
-      }
-      errors {
-        field
-        message
-        code
-      }
+      id
+      bedNumber
+      bedType
+      status
+      hasOxygen
+      hasVentilator
+      hasMonitoring
+      patientAge
+      admissionType
+      estimatedDischarge
+      updatedAt
     }
   }
 `;
@@ -131,28 +114,34 @@ export const UPDATE_BED_STATUS = gql`
 export const DISPATCH_AMBULANCE = gql`
   mutation DispatchAmbulance($input: DispatchAmbulanceInput!) {
     dispatchAmbulance(input: $input) {
-      success
-      dispatch {
+      id
+      status
+      priority
+      dispatchLocation {
+        latitude
+        longitude
+      }
+      estimatedArrival
+      dispatchInstructions
+      ambulance {
         id
-        incident {
-          id
-          incidentNumber
-          severity
+        unitNumber
+        equipmentLevel
+        currentLocation {
+          latitude
+          longitude
         }
-        ambulance {
-          id
-          unitNumber
-          equipmentLevel
+      }
+      incident {
+        id
+        incidentNumber
+        location {
+          latitude
+          longitude
         }
-        eta
-        status
-        dispatchedAt
+        description
       }
-      errors {
-        field
-        message
-        code
-      }
+      dispatchedAt
     }
   }
 `;
@@ -160,21 +149,86 @@ export const DISPATCH_AMBULANCE = gql`
 export const UPDATE_RESOURCE_QUANTITY = gql`
   mutation UpdateResourceQuantity($input: UpdateResourceQuantityInput!) {
     updateResourceQuantity(input: $input) {
-      success
-      resource {
-        id
+      id
+      name
+      category
+      currentQuantity
+      minimumQuantity
+      unit
+      expirationDate
+      status
+      lastUpdated
+    }
+  }
+`;
+
+export const GET_NEARBY_HOSPITALS = gql`
+  query GetNearbyHospitals($location: LocationInput!, $radius: Float) {
+    nearbyHospitals(location: $location, radius: $radius) {
+      id
+      name
+      facilityType {
         name
         category
-        currentQuantity
-        minimumQuantity
-        unit
-        status
-        lastUpdated
       }
-      errors {
-        field
-        message
-        code
+      location {
+        latitude
+        longitude
+      }
+      acceptsEmergencies
+      emergencyBeds
+      currentOccupancy
+      phoneNumber
+      emergencyPhone
+    }
+  }
+`;
+
+export const GET_AVAILABLE_AMBULANCES = gql`
+  query GetAvailableAmbulances($facilityId: ID!) {
+    ambulances(filters: { facilityId: $facilityId, status: AVAILABLE }) {
+      id
+      unitNumber
+      make
+      model
+      year
+      equipmentLevel
+      patientCapacity
+      medicalEquipment
+      status
+      currentLocation {
+        latitude
+        longitude
+      }
+      lastLocationUpdate
+      isOperational
+    }
+  }
+`;
+
+export const GET_FACILITY_ANALYTICS = gql`
+  query GetFacilityAnalytics($facilityId: ID!, $dateRange: DateRangeInput) {
+    facilityAnalytics(facilityId: $facilityId, dateRange: $dateRange) {
+      occupancyRate
+      averageResponseTime
+      totalIncidents
+      resolvedIncidents
+      bedUtilization {
+        bedType
+        totalBeds
+        occupiedBeds
+        utilizationRate
+      }
+      ambulanceUtilization {
+        totalAmbulances
+        availableAmbulances
+        dispatchedAmbulances
+        utilizationRate
+      }
+      incidentTrends {
+        date
+        count
+        severity
       }
     }
   }

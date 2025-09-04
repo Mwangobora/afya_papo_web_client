@@ -2,6 +2,9 @@
 import { apolloClient } from '../config/apollo.config';
 import {
   GET_FACILITY_DASHBOARD,
+  GET_NEARBY_HOSPITALS,
+  GET_AVAILABLE_AMBULANCES,
+  GET_FACILITY_ANALYTICS,
   UPDATE_BED_STATUS,
   DISPATCH_AMBULANCE,
   UPDATE_RESOURCE_QUANTITY,
@@ -132,6 +135,60 @@ export class FacilityService {
         data: null,
         errors,
       };
+    }
+  }
+
+  async getNearbyHospitals(
+    location: { latitude: number; longitude: number },
+    radius?: number
+  ): Promise<Facility[]> {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_NEARBY_HOSPITALS,
+        variables: { location, radius },
+        errorPolicy: 'all',
+        fetchPolicy: 'cache-first',
+      });
+
+      return data?.nearbyHospitals || [];
+    } catch (error) {
+      console.error('Error fetching nearby hospitals:', error);
+      return [];
+    }
+  }
+
+  async getAvailableAmbulances(facilityId: string): Promise<any[]> {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_AVAILABLE_AMBULANCES,
+        variables: { facilityId },
+        errorPolicy: 'all',
+        fetchPolicy: 'cache-first',
+      });
+
+      return data?.ambulances || [];
+    } catch (error) {
+      console.error('Error fetching available ambulances:', error);
+      return [];
+    }
+  }
+
+  async getFacilityAnalytics(
+    facilityId: string,
+    dateRange?: { startDate: string; endDate: string }
+  ): Promise<any> {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_FACILITY_ANALYTICS,
+        variables: { facilityId, dateRange },
+        errorPolicy: 'all',
+        fetchPolicy: 'cache-first',
+      });
+
+      return data?.facilityAnalytics || null;
+    } catch (error) {
+      console.error('Error fetching facility analytics:', error);
+      return null;
     }
   }
 }

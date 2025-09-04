@@ -2,8 +2,12 @@
 import { apolloClient } from '../config/apollo.config';
 import {
   GET_ACTIVE_INCIDENTS,
+  GET_INCIDENT_DETAILS,
   CREATE_INCIDENT,
   UPDATE_INCIDENT_STATUS,
+  ACCEPT_ASSIGNMENT,
+  DECLINE_ASSIGNMENT,
+  UPDATE_RESPONDER_LOCATION,
 } from '../graphql/incident.operations';
 import type {
   Incident,
@@ -12,7 +16,7 @@ import type {
   IncidentStatus,
 
 } from '../types/incident.types';
-import type { Location, ApiResponse, Resource, PaginatedResponse } from '../types';
+import type { Location, ApiResponse, PaginatedResponse } from '../types';
 
 import { ErrorHandler } from '../utils/error.utils';
 
@@ -28,18 +32,29 @@ interface IncidentFilters {
 
 interface CreateIncidentInput {
   incidentType: IncidentType;
-  severity: SeverityLevel;
   location: Location;
+  description: string;
+  symptoms?: string;
   patientCount: number;
   patientAge?: number;
-  symptoms?: string;
-  description?: string;
+  patientGender?: string;
+  patientConscious?: boolean;
+  patientBreathing?: boolean;
+  ambulanceNeeded: boolean;
+  addressDescription?: string;
+  specializedEquipmentNeeded?: string;
 }
 
 interface UpdateIncidentStatusInput {
   incidentId: string;
   status: IncidentStatus;
   notes?: string;
+  location?: Location;
+}
+
+interface DeclineAssignmentInput {
+  assignmentId: string;
+  reason: string;
 }
 
 export class IncidentService {
@@ -62,26 +77,15 @@ export class IncidentService {
         fetchPolicy: 'cache-first',
       });
 
-      const incidents = data?.incidents;
-
-      if (!incidents) {
-        return {
-          data: [],
-          totalCount: 0,
-          hasNextPage: false,
-          hasPreviousPage: false,
-          currentPage: 1,
-          totalPages: 0,
-        };
-      }
+      const incidents = data?.incidents || [];
 
       return {
-        data: incidents.data || [],
-        totalCount: incidents.totalCount || 0,
-        hasNextPage: incidents.hasNextPage || false,
-        hasPreviousPage: incidents.hasPreviousPage || false,
-        currentPage: incidents.currentPage || 1,
-        totalPages: incidents.totalPages || 0,
+        data: incidents,
+        totalCount: incidents.length,
+        hasNextPage: false,
+        hasPreviousPage: false,
+        currentPage: 1,
+        totalPages: 1,
       };
     } catch (error) {
       console.error('Error fetching active incidents:', error);
@@ -108,7 +112,7 @@ export class IncidentService {
 
       return {
         success: result?.success || false,
-        data: result?.incident || null,
+        data: result?.incident || undefined,
         errors: result?.errors || [],
       };
     } catch (error) {
@@ -116,7 +120,7 @@ export class IncidentService {
       const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        data: null,
+        data: undefined,
         errors,
       };
     }
@@ -136,7 +140,7 @@ export class IncidentService {
 
       return {
         success: result?.success || false,
-        data: result?.incident || null,
+        data: result?.incident || undefined,
         errors: result?.errors || [],
       };
     } catch (error) {
@@ -144,7 +148,101 @@ export class IncidentService {
       const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        data: null,
+        data: undefined,
+        errors,
+      };
+    }
+  }
+
+  async getIncidentDetails(incidentId: string): Promise<Incident | null> {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_INCIDENT_DETAILS,
+        variables: { id: incidentId },
+        errorPolicy: 'all',
+        fetchPolicy: 'cache-first',
+      });
+
+      return data?.incident || undefined;
+    } catch (error) {
+      console.error('Error fetching incident details:', error);
+      return undefined;
+    }
+  }
+
+  async acceptAssignment(assignmentId: string): Promise<ApiResponse<unknown>> {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: ACCEPT_ASSIGNMENT,
+        variables: { assignmentId },
+        errorPolicy: 'all',
+      });
+
+      const result = data?.acceptAssignment;
+
+      return {
+        success: result?.success || false,
+        data: result || null,
+        errors: result?.errors || [],
+      };
+    } catch (error) {
+      console.error('Error accepting assignment:', error);
+      const errors = ErrorHandler.handleError(error);
+      return {
+        success: false,
+        data: undefined,
+        errors,
+      };
+    }
+  }
+
+  async declineAssignment(input: DeclineAssignmentInput): Promise<ApiResponse<unknown>> {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: DECLINE_ASSIGNMENT,
+        variables: { input },
+        errorPolicy: 'all',
+      });
+
+      const result = data?.declineAssignment;
+
+      return {
+        success: result?.success || false,
+        data: result || null,
+        errors: result?.errors || [],
+      };
+    } catch (error) {
+      console.error('Error declining assignment:', error);
+      const errors = ErrorHandler.handleError(error);
+      return {
+        success: false,
+        data: undefined,
+        errors,
+      };
+    }
+  }
+
+  async updateResponderLocation(location: Location): Promise<ApiResponse<unknown>> {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: UPDATE_RESPONDER_LOCATION,
+        variables: { location },
+        errorPolicy: 'all',
+      });
+
+      const result = data?.updateResponderLocation;
+
+      return {
+        success: result?.success || false,
+        data: result || null,
+        errors: result?.errors || [],
+      };
+    } catch (error) {
+      console.error('Error updating responder location:', error);
+      const errors = ErrorHandler.handleError(error);
+      return {
+        success: false,
+        data: undefined,
         errors,
       };
     }

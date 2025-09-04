@@ -1,16 +1,23 @@
 export class ApiEndpoints {
-  // Access env variable at runtime
+  // Access Vite environment variables at runtime
   private static get BASE_URL(): string {
-    const url = process.env.REACT_APP_API_BASE_URL;
-    if (!url) throw new Error('REACT_APP_API_BASE_URL is not defined');
+    const url = import.meta.env.VITE_API_BASE_URL;
+    if (!url) {
+      console.warn('VITE_API_BASE_URL is not defined, using default localhost:8000');
+      return 'http://localhost:8000';
+    }
     return url;
   }
 
   static get graphql() {
+    const endpoint = import.meta.env.VITE_GRAPHQL_ENDPOINT;
+    if (endpoint) return endpoint;
     return `${this.BASE_URL}/graphql/`;
   }
 
   static get websocket() {
+    const endpoint = import.meta.env.VITE_WEBSOCKET_ENDPOINT;
+    if (endpoint) return endpoint;
     return this.BASE_URL.replace(/^http/, 'ws') + '/ws/graphql/';
   }
 

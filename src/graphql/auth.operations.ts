@@ -1,24 +1,65 @@
 import { gql } from '@apollo/client';
 
-export const ADMIN_LOGIN = gql`
-  mutation AdminLogin($input: AdminLoginInput!) {
-    adminLogin(input: $input) {
+export const LOGIN = gql`
+  mutation Login($input: LoginInput!) {
+    login(input: $input) {
       success
+      accessToken
+      refreshToken
       user {
         id
-        username
-        email
-        fullName
+        phoneNumber
         userType
-        isActive
+        preferredLanguage
+        verificationStatus
+        isPhoneVerified
+        profile {
+          fullName
+          nationalIdNumber
+          dateOfBirth
+          gender
+          bloodType
+          medicalConditions
+          medications
+          allergies
+          healthInsuranceProvider
+          healthInsuranceNumber
+          region
+          district
+          address
+        }
+        emergencyContacts {
+          id
+          name
+          phoneNumber
+          relationship
+          isPrimary
+        }
         hospitalAdminProfile {
           id
           primaryFacility {
             id
             name
-            facilityType
-            region
-            district
+            facilityType {
+              name
+              category
+            }
+            region {
+              name
+              code
+            }
+            district {
+              name
+              code
+            }
+            location {
+              latitude
+              longitude
+              address
+            }
+            phoneNumber
+            emergencyPhone
+            email
           }
           permissions {
             canManageBeds
@@ -35,21 +76,88 @@ export const ADMIN_LOGIN = gql`
         emergencyResponderProfile {
           id
           responderType
-          certificationLevel
-          isOnDuty
+          fullName
+          licenseNumber
+          primaryQualification
+          yearsOfExperience
+          specializations
+          primaryHospital {
+            id
+            name
+            facilityType {
+              name
+              category
+            }
+          }
+          affiliatedHospitals {
+            id
+            name
+            facilityType {
+              name
+              category
+            }
+          }
+          verificationStatus
+          availabilityStatus
           currentLocation {
             latitude
             longitude
+            accuracy
           }
-          assignedFacility {
-            id
-            name
-          }
+          serviceRadius
+          totalResponses
+          successfulResponses
+          averageResponseTime
+          averageRating
         }
       }
+      message
+      errors
+    }
+  }
+`;
+
+export const REGISTER = gql`
+  mutation Register($input: RegisterInput!) {
+    register(input: $input) {
+      success
       accessToken
       refreshToken
-      expiresAt
+      user {
+        id
+        phoneNumber
+        userType
+        preferredLanguage
+        verificationStatus
+        isPhoneVerified
+        profile {
+          fullName
+        }
+      }
+      message
+      errors
+    }
+  }
+`;
+
+export const VERIFY_PHONE = gql`
+  mutation VerifyPhone($input: VerifyPhoneInput!) {
+    verifyPhone(input: $input) {
+      success
+      accessToken
+      refreshToken
+      user {
+        id
+        phoneNumber
+        userType
+        preferredLanguage
+        verificationStatus
+        isPhoneVerified
+        profile {
+          fullName
+        }
+      }
+      message
       errors
     }
   }
@@ -61,7 +169,7 @@ export const REFRESH_TOKEN = gql`
       success
       accessToken
       refreshToken
-      expiresAt
+      message
       errors
     }
   }
@@ -80,31 +188,58 @@ export const GET_CURRENT_USER = gql`
   query GetCurrentUser {
     me {
       id
-      username
-      email
-      fullName
+      phoneNumber
       userType
-      isActive
-      createdAt
-      updatedAt
+      preferredLanguage
+      verificationStatus
+      isPhoneVerified
+      profile {
+        fullName
+        nationalIdNumber
+        dateOfBirth
+        gender
+        bloodType
+        medicalConditions
+        medications
+        allergies
+        healthInsuranceProvider
+        healthInsuranceNumber
+        region
+        district
+        address
+      }
+      emergencyContacts {
+        id
+        name
+        phoneNumber
+        relationship
+        isPrimary
+      }
       hospitalAdminProfile {
         id
         primaryFacility {
           id
           name
-          facilityType
-          region
-          district
+          facilityType {
+            name
+            category
+          }
+          region {
+            name
+            code
+          }
+          district {
+            name
+            code
+          }
           location {
             latitude
             longitude
             address
           }
-          contactInfo {
-            phone
-            email
-            emergencyPhone
-          }
+          phoneNumber
+          emergencyPhone
+          email
         }
         permissions {
           canManageBeds
@@ -121,18 +256,42 @@ export const GET_CURRENT_USER = gql`
       emergencyResponderProfile {
         id
         responderType
-        certificationLevel
-        isOnDuty
+        fullName
+        licenseNumber
+        primaryQualification
+        yearsOfExperience
+        specializations
+        primaryHospital {
+          id
+          name
+          facilityType {
+            name
+            category
+          }
+        }
+        affiliatedHospitals {
+          id
+          name
+          facilityType {
+            name
+            category
+          }
+        }
+        verificationStatus
+        availabilityStatus
         currentLocation {
           latitude
           longitude
+          accuracy
         }
-        assignedFacility {
-          id
-          name
-          facilityType
-        }
+        serviceRadius
+        totalResponses
+        successfulResponses
+        averageResponseTime
+        averageRating
       }
+      createdAt
+      lastLogin
     }
   }
 `;

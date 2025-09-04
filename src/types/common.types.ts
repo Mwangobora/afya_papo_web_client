@@ -4,6 +4,7 @@ import type { User } from "./auth.types"
 export interface Location {
   latitude: number;
   longitude: number;
+  accuracy?: number;
   address?: string;
   region?: string;
   district?: string;

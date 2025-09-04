@@ -4,15 +4,49 @@ import type { Incident} from "./incident.types";
 
 export interface User {
   id: string;
-  username: string;
-  email: string;
-  fullName: string;
+  phoneNumber: string;
   userType: UserType;
-  hospitalAdminProfile?: HospitalAdminProfile;
-  emergencyResponderProfile?: EmergencyResponderProfile;
-  isActive: boolean;
+  preferredLanguage: LanguageEnum;
+  verificationStatus: VerificationStatusEnum;
+  isPhoneVerified: boolean;
+  
+  // Profile information
+  profile?: UserProfile;
+  emergencyContacts?: EmergencyContact[];
+  
+  // Timestamps
   createdAt: string;
-  updatedAt: string;
+  lastLogin?: string;
+}
+
+export interface UserProfile {
+  fullName: string;
+  nationalIdNumber?: string;
+  dateOfBirth?: string;
+  gender?: GenderEnum;
+  
+  // Health information
+  bloodType?: BloodTypeEnum;
+  medicalConditions?: string;
+  medications?: string;
+  allergies?: string;
+  
+  // Insurance
+  healthInsuranceProvider?: string;
+  healthInsuranceNumber?: string;
+  
+  // Location
+  region?: string;
+  district?: string;
+  address?: string;
+}
+
+export interface EmergencyContact {
+  id: string;
+  name: string;
+  phoneNumber: string;
+  relationship: string;
+  isPrimary: boolean;
 }
 
 export interface HospitalAdminProfile {
@@ -44,15 +78,42 @@ export interface AdminPermissions {
 
 export type UserType = 
   | 'CITIZEN' 
-  | 'EMERGENCY_RESPONDER' 
+  | 'RESPONDER' 
   | 'HOSPITAL_ADMIN' 
-  | 'SYSTEM_ADMIN';
+  | 'SYSTEM_ADMIN'
+  | 'DISPATCHER';
 
 export type ResponderType = 
-  | 'PARAMEDIC' 
-  | 'NURSE' 
-  | 'DOCTOR' 
-  | 'TECHNICIAN';
+  | 'DOCTOR'
+  | 'NURSE'
+  | 'PARAMEDIC'
+  | 'CLINICAL_OFFICER'
+  | 'MEDICAL_ASSISTANT';
+
+export type LanguageEnum = 'EN' | 'SW';
+
+export type VerificationStatusEnum = 
+  | 'UNVERIFIED'
+  | 'PHONE_VERIFIED'
+  | 'FULLY_VERIFIED';
+
+export type GenderEnum = 'MALE' | 'FEMALE' | 'OTHER';
+
+export type BloodTypeEnum = 
+  | 'A_POSITIVE'
+  | 'A_NEGATIVE'
+  | 'B_POSITIVE'
+  | 'B_NEGATIVE'
+  | 'AB_POSITIVE'
+  | 'AB_NEGATIVE'
+  | 'O_POSITIVE'
+  | 'O_NEGATIVE';
+
+export type AvailabilityStatusEnum = 
+  | 'AVAILABLE'
+  | 'BUSY'
+  | 'OFF_DUTY'
+  | 'UNAVAILABLE';
 
 export interface AuthTokens {
   accessToken: string;
@@ -61,10 +122,35 @@ export interface AuthTokens {
 }
 
 export interface LoginCredentials {
-  username: string;
+  phoneNumber: string;
   password: string;
-  userType?: UserType;
+  deviceInfo?: DeviceInfo;
 }
+
+export interface DeviceInfo {
+  deviceId: string;
+  deviceType: 'mobile' | 'web' | 'tablet';
+  os: string;
+  appVersion?: string;
+}
+
+export interface RegisterInput {
+  phoneNumber: string;
+  userType: UserType;
+  preferredLanguage: LanguageEnum;
+  fullName: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  password: string;
+}
+
+export interface VerifyPhoneInput {
+  phoneNumber: string;
+  otpCode: string;
+  verificationType: VerificationTypeEnum;
+}
+
+export type VerificationTypeEnum = 'REGISTRATION' | 'LOGIN' | 'PASSWORD_RESET';
 
 export interface LoginResponse {
   success: boolean;

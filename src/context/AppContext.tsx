@@ -17,8 +17,8 @@ interface AppProviderProps {
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const appContextValue: AppContextType = {
-    version: process.env.REACT_APP_VERSION || '1.0.0',
-    environment: (process.env.NODE_ENV as any) || 'development',
+    version: import.meta.env.VITE_APP_VERSION || '1.0.0',
+    environment: (import.meta.env.MODE as 'development' | 'production' | 'staging') || 'development',
   };
 
   return (

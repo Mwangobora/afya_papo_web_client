@@ -1,80 +1,82 @@
-import { gql } from "@apollo/client";
+import { gql } from '@apollo/client';
 
 export const GET_ACTIVE_INCIDENTS = gql`
-  query GetActiveIncidents(
-    $facilityId: ID!
-    $filters: IncidentFilters
-    $limit: Int
-    $offset: Int
-  ) {
-    incidents(
-      facilityId: $facilityId
-      filters: $filters
-      limit: $limit
-      offset: $offset
-    ) {
-      data {
+  query GetActiveIncidents($facilityId: String, $filters: IncidentFiltersInput, $limit: Int, $offset: Int) {
+    incidents(filters: $filters) {
+      id
+      incidentNumber
+      reporter {
         id
-        incidentNumber
-        incidentType
-        severity
+        phoneNumber
+        profile {
+          fullName
+        }
+      }
+      incidentType
+      severity
+      status
+      location {
+        latitude
+        longitude
+        accuracy
+        address
+      }
+      description
+      symptoms
+      patientCount
+      patientAge
+      patientGender
+      patientConscious
+      patientBreathing
+      ambulanceNeeded
+      assignments {
+        id
         status
-        location {
-          latitude
-          longitude
-          address
-          region
-          district
-        }
-        patientCount
-        patientAge
-        symptoms
-        estimatedArrival
-        assignments {
+        priority
+        responder {
           id
-          responder {
-            id
+          profile {
             fullName
+          }
+          emergencyResponderProfile {
             responderType
-          }
-          role
-          status
-          assignedAt
-          arrivedAt
-        }
-        timeline {
-          id
-          eventType
-          description
-          timestamp
-          createdBy {
-            id
             fullName
           }
         }
-        dispatchedAmbulances {
+        estimatedTravelTime
+        responseDeadline
+      }
+      ambulanceAssignments {
+        id
+        status
+        ambulance {
           id
           unitNumber
-          status
           equipmentLevel
-          currentLocation {
-            latitude
-            longitude
+        }
+        estimatedArrival
+      }
+      timeline {
+        id
+        eventType
+        description
+        timestamp
+        updatedBy {
+          id
+          profile {
+            fullName
           }
         }
-        destinationFacility {
-          id
-          name
-          facilityType
-        }
-        createdAt
-        updatedAt
       }
-      totalCount
-      hasNextPage
-      hasPreviousPage
-      currentPage
-      totalPages
+      triage {
+        id
+        triageColor
+        priorityScore
+        assessmentNotes
+        recommendedCareLevel
+      }
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -82,27 +84,31 @@ export const GET_ACTIVE_INCIDENTS = gql`
 export const CREATE_INCIDENT = gql`
   mutation CreateIncident($input: CreateIncidentInput!) {
     createIncident(input: $input) {
-      success
-      incident {
-        id
-        incidentNumber
-        incidentType
-        severity
-        status
-        location {
-          latitude
-          longitude
-          address
-        }
-        patientCount
-        patientAge
-        symptoms
-        createdAt
+      id
+      incidentNumber
+      status
+      severity
+      location {
+        latitude
+        longitude
+        accuracy
       }
-      errors {
-        field
-        message
-        code
+      assignments {
+        id
+        responder {
+          profile {
+            fullName
+          }
+          emergencyResponderProfile {
+            responderType
+            phoneNumber
+          }
+        }
+        estimatedTravelTime
+      }
+      triage {
+        triageColor
+        priorityScore
       }
     }
   }
@@ -111,23 +117,205 @@ export const CREATE_INCIDENT = gql`
 export const UPDATE_INCIDENT_STATUS = gql`
   mutation UpdateIncidentStatus($input: UpdateIncidentStatusInput!) {
     updateIncidentStatus(input: $input) {
-      success
-      incident {
+      id
+      status
+      timeline {
+        eventType
+        description
+        timestamp
+      }
+    }
+  }
+`;
+
+export const GET_INCIDENT_DETAILS = gql`
+  query GetIncidentDetails($id: ID!) {
+    incident(id: $id) {
+      id
+      incidentNumber
+      reporter {
         id
-        incidentNumber
-        status
-        updatedAt
-        timeline {
-          id
-          eventType
-          description
-          timestamp
+        phoneNumber
+        profile {
+          fullName
+          bloodType
+          medicalConditions
+          allergies
         }
       }
-      errors {
-        field
-        message
-        code
+      incidentType
+      severity
+      status
+      location {
+        latitude
+        longitude
+        accuracy
+        address
+      }
+      description
+      symptoms
+      patientCount
+      patientAge
+      patientGender
+      patientConscious
+      patientBreathing
+      ambulanceNeeded
+      assignments {
+        id
+        status
+        priority
+        assignmentOrder
+        assignedLocation {
+          latitude
+          longitude
+        }
+        incidentLocation {
+          latitude
+          longitude
+        }
+        estimatedDistance
+        estimatedTravelTime
+        notificationSentAt
+        responseDeadline
+        respondedAt
+        departedAt
+        arrivedAt
+        completedAt
+        actualTravelTime
+        totalResponseTime
+        assignmentNotes
+        responderNotes
+        declineReason
+        responder {
+          id
+          profile {
+            fullName
+          }
+          emergencyResponderProfile {
+            responderType
+            fullName
+            licenseNumber
+            primaryQualification
+            yearsOfExperience
+            specializations
+            averageResponseTime
+            averageRating
+            currentLocation {
+              latitude
+              longitude
+            }
+          }
+        }
+      }
+      ambulanceAssignments {
+        id
+        status
+        priority
+        dispatchLocation {
+          latitude
+          longitude
+        }
+        estimatedArrival
+        actualArrival
+        transportStarted
+        hospitalArrival
+        dispatchInstructions
+        crewNotes
+        responseTimeMinutes
+        transportTimeMinutes
+        ambulance {
+          id
+          unitNumber
+          equipmentLevel
+          patientCapacity
+          medicalEquipment
+          currentLocation {
+            latitude
+            longitude
+          }
+        }
+      }
+      timeline {
+        id
+        eventType
+        description
+        updatedBy {
+          id
+          profile {
+            fullName
+          }
+        }
+        updatedByRole
+        location {
+          latitude
+          longitude
+        }
+        metadata
+        timestamp
+      }
+      triage {
+        id
+        triageColor
+        priorityScore
+        airwayClear
+        breathingAdequate
+        circulationAdequate
+        consciousnessLevel
+        heartRate
+        bloodPressure
+        temperature
+        assessmentNotes
+        recommendedCareLevel
+        assessedAt
+      }
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const ACCEPT_ASSIGNMENT = gql`
+  mutation AcceptAssignment($assignmentId: ID!) {
+    acceptAssignment(assignmentId: $assignmentId) {
+      id
+      status
+      incident {
+        incidentNumber
+        location {
+          latitude
+          longitude
+        }
+        description
+        reporter {
+          phoneNumber
+        }
+      }
+      estimatedTravelTime
+      responseDeadline
+    }
+  }
+`;
+
+export const DECLINE_ASSIGNMENT = gql`
+  mutation DeclineAssignment($input: DeclineAssignmentInput!) {
+    declineAssignment(input: $input) {
+      id
+      status
+      declineReason
+    }
+  }
+`;
+
+export const UPDATE_RESPONDER_LOCATION = gql`
+  mutation UpdateResponderLocation($location: LocationInput!) {
+    updateResponderLocation(location: $location) {
+      id
+      currentLocation {
+        latitude
+        longitude
+      }
+      availability {
+        lastLocationUpdate
       }
     }
   }

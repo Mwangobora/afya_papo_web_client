@@ -3,18 +3,19 @@ import type { User, UserType, AdminPermissions } from '../types/auth.types';
 export class RBACService {
   private static readonly ROLE_PRIORITIES: Record<UserType, number> = {
     'CITIZEN': 1,
-    'EMERGENCY_RESPONDER': 2,
+    'RESPONDER': 2,
     'HOSPITAL_ADMIN': 3,
     'SYSTEM_ADMIN': 4,
+    'DISPATCHER': 3,
   };
 
   private static readonly PERMISSION_HIERARCHY: Record<keyof AdminPermissions, UserType[]> = {
     canManageBeds: ['HOSPITAL_ADMIN', 'SYSTEM_ADMIN'],
     canManageStaff: ['HOSPITAL_ADMIN', 'SYSTEM_ADMIN'],
     canManageResources: ['HOSPITAL_ADMIN', 'SYSTEM_ADMIN'],
-    canViewPatientData: ['EMERGENCY_RESPONDER', 'HOSPITAL_ADMIN', 'SYSTEM_ADMIN'],
-    canGenerateReports: ['HOSPITAL_ADMIN', 'SYSTEM_ADMIN'],
-    canManageAmbulances: ['HOSPITAL_ADMIN', 'SYSTEM_ADMIN'],
+    canViewPatientData: ['RESPONDER', 'HOSPITAL_ADMIN', 'SYSTEM_ADMIN', 'DISPATCHER'],
+    canGenerateReports: ['HOSPITAL_ADMIN', 'SYSTEM_ADMIN', 'DISPATCHER'],
+    canManageAmbulances: ['HOSPITAL_ADMIN', 'SYSTEM_ADMIN', 'DISPATCHER'],
   };
 
   static canUserAccessResource(
@@ -80,8 +81,8 @@ export class RBACService {
     }
 
     // Emergency responders can access their assigned facility
-    if (user.userType === 'EMERGENCY_RESPONDER') {
-      return user.emergencyResponderProfile?.assignedFacility?.id === facilityId;
+    if (user.userType === 'RESPONDER') {
+      return user.emergencyResponderProfile?.primaryHospital?.id === facilityId;
     }
 
     return false;
@@ -99,8 +100,8 @@ export class RBACService {
       facilityIds.push(user.hospitalAdminProfile.primaryFacility.id);
     }
 
-    if (user.emergencyResponderProfile?.assignedFacility?.id) {
-      facilityIds.push(user.emergencyResponderProfile.assignedFacility.id);
+    if (user.emergencyResponderProfile?.primaryHospital?.id) {
+      facilityIds.push(user.emergencyResponderProfile.primaryHospital.id);
     }
 
     return facilityIds;
@@ -115,12 +116,26 @@ export class RBACService {
         permissions.push('create_emergency_report');
         break;
 
-      case 'EMERGENCY_RESPONDER':
+      case 'RESPONDER':
         permissions.push(
           'create_emergency_report',
           'respond_to_incidents',
           'update_incident_status',
-          'view_assigned_incidents'
+          'view_assigned_incidents',
+          'accept_assignment',
+          'decline_assignment',
+          'update_location'
+        );
+        break;
+
+      case 'DISPATCHER':
+        permissions.push(
+          'view_all_incidents',
+          'assign_responders',
+          'coordinate_emergencies',
+          'view_all_responders',
+          'dispatch_ambulances',
+          'view_analytics'
         );
         break;
 

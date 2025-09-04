@@ -1,7 +1,9 @@
 
 import { apolloClient } from '../config/apollo.config';
 import { 
-  ADMIN_LOGIN, 
+  LOGIN,
+  REGISTER,
+  VERIFY_PHONE,
   REFRESH_TOKEN, 
   LOGOUT, 
   GET_CURRENT_USER 
@@ -10,7 +12,9 @@ import type {
   User, 
   LoginCredentials, 
   LoginResponse, 
-  AuthTokens 
+  AuthTokens,
+  RegisterInput,
+  VerifyPhoneInput
 } from '../types/auth.types';
 import { ErrorHandler } from '../utils/error.utils';
 
@@ -18,18 +22,18 @@ export class AuthService {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
       const { data } = await apolloClient.mutate({
-        mutation: ADMIN_LOGIN,
+        mutation: LOGIN,
         variables: {
           input: {
-            username: credentials.username,
+            phoneNumber: credentials.phoneNumber,
             password: credentials.password,
-            userType: credentials.userType || 'HOSPITAL_ADMIN',
+            deviceInfo: credentials.deviceInfo,
           },
         },
         errorPolicy: 'all',
       });
 
-      const result = data?.adminLogin;
+      const result = data?.login;
 
       if (result?.success && result.user && result.accessToken) {
         return {
@@ -38,7 +42,7 @@ export class AuthService {
           tokens: {
             accessToken: result.accessToken,
             refreshToken: result.refreshToken,
-            expiresAt: result.expiresAt,
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(), // 15 minutes
           },
         };
       } else {
@@ -49,6 +53,78 @@ export class AuthService {
       }
     } catch (error) {
       console.error('Login error:', error);
+      const errors = ErrorHandler.handleError(error);
+      return {
+        success: false,
+        errors: errors.map(e => e.message),
+      };
+    }
+  }
+
+  async register(input: RegisterInput): Promise<LoginResponse> {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: REGISTER,
+        variables: { input },
+        errorPolicy: 'all',
+      });
+
+      const result = data?.register;
+
+      if (result?.success && result.user && result.accessToken) {
+        return {
+          success: true,
+          user: result.user,
+          tokens: {
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+          },
+        };
+      } else {
+        return {
+          success: false,
+          errors: result?.errors || ['Registration failed'],
+        };
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      const errors = ErrorHandler.handleError(error);
+      return {
+        success: false,
+        errors: errors.map(e => e.message),
+      };
+    }
+  }
+
+  async verifyPhone(input: VerifyPhoneInput): Promise<LoginResponse> {
+    try {
+      const { data } = await apolloClient.mutate({
+        mutation: VERIFY_PHONE,
+        variables: { input },
+        errorPolicy: 'all',
+      });
+
+      const result = data?.verifyPhone;
+
+      if (result?.success && result.user && result.accessToken) {
+        return {
+          success: true,
+          user: result.user,
+          tokens: {
+            accessToken: result.accessToken,
+            refreshToken: result.refreshToken,
+            expiresAt: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+          },
+        };
+      } else {
+        return {
+          success: false,
+          errors: result?.errors || ['Phone verification failed'],
+        };
+      }
+    } catch (error) {
+      console.error('Phone verification error:', error);
       const errors = ErrorHandler.handleError(error);
       return {
         success: false,

@@ -1,6 +1,6 @@
 // src/services/token.service.ts
 import Cookies from 'js-cookie';
-import{ AuthTokens } from '../types/auth.types';
+import type{ AuthTokens } from '../types/auth.types';
 
 export class TokenService {
   private static readonly ACCESS_TOKEN_KEY = 'afyapapo_access_token';
@@ -143,95 +143,3 @@ export class TokenService {
   }
 }
 
-// src/services/storage.service.ts
-export class StorageService {
-  private static readonly PREFIX = 'afyapapo_';
-
-  static setItem(key: string, value: any): void {
-    try {
-      const serializedValue = JSON.stringify(value);
-      localStorage.setItem(this.PREFIX + key, serializedValue);
-    } catch (error) {
-      console.error('Error setting item in storage:', error);
-    }
-  }
-
-  static getItem<T>(key: string, defaultValue: T | null = null): T | null {
-    try {
-      const item = localStorage.getItem(this.PREFIX + key);
-      if (item === null) return defaultValue;
-      
-      return JSON.parse(item) as T;
-    } catch (error) {
-      console.error('Error getting item from storage:', error);
-      return defaultValue;
-    }
-  }
-
-  static removeItem(key: string): void {
-    try {
-      localStorage.removeItem(this.PREFIX + key);
-    } catch (error) {
-      console.error('Error removing item from storage:', error);
-    }
-  }
-
-  static clear(): void {
-    try {
-      const keys = Object.keys(localStorage);
-      keys.forEach(key => {
-        if (key.startsWith(this.PREFIX)) {
-          localStorage.removeItem(key);
-        }
-      });
-    } catch (error) {
-      console.error('Error clearing storage:', error);
-    }
-  }
-
-  static hasItem(key: string): boolean {
-    try {
-      return localStorage.getItem(this.PREFIX + key) !== null;
-    } catch (error) {
-      console.error('Error checking item in storage:', error);
-      return false;
-    }
-  }
-}
-
-// src/services/encryption.service.ts
-export class EncryptionService {
-  private static readonly SECRET_KEY = process.env.REACT_APP_ENCRYPTION_KEY || 'default-secret-key';
-
-  static encrypt(data: string): string {
-    try {
-      // Simple base64 encoding for demonstration
-      // In production, use proper encryption like crypto-js
-      return btoa(encodeURIComponent(data));
-    } catch (error) {
-      console.error('Error encrypting data:', error);
-      return data;
-    }
-  }
-
-  static decrypt(encryptedData: string): string {
-    try {
-      // Simple base64 decoding for demonstration
-      return decodeURIComponent(atob(encryptedData));
-    } catch (error) {
-      console.error('Error decrypting data:', error);
-      return encryptedData;
-    }
-  }
-
-  static generateRandomString(length: number = 32): string {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    
-    for (let i = 0; i < length; i++) {
-      result += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    
-    return result;
-  }
-}

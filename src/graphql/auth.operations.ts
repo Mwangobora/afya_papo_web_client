@@ -1,4 +1,3 @@
-
 import { gql } from '@apollo/client';
 
 export const ADMIN_LOGIN = gql`
@@ -11,12 +10,15 @@ export const ADMIN_LOGIN = gql`
         email
         fullName
         userType
+        isActive
         hospitalAdminProfile {
           id
           primaryFacility {
             id
             name
             facilityType
+            region
+            district
           }
           permissions {
             canManageBeds
@@ -29,6 +31,20 @@ export const ADMIN_LOGIN = gql`
           departmentAccess
           canManageFleet
           canViewAnalytics
+        }
+        emergencyResponderProfile {
+          id
+          responderType
+          certificationLevel
+          isOnDuty
+          currentLocation {
+            latitude
+            longitude
+          }
+          assignedFacility {
+            id
+            name
+          }
         }
       }
       accessToken
@@ -69,6 +85,8 @@ export const GET_CURRENT_USER = gql`
       fullName
       userType
       isActive
+      createdAt
+      updatedAt
       hospitalAdminProfile {
         id
         primaryFacility {
@@ -77,6 +95,16 @@ export const GET_CURRENT_USER = gql`
           facilityType
           region
           district
+          location {
+            latitude
+            longitude
+            address
+          }
+          contactInfo {
+            phone
+            email
+            emergencyPhone
+          }
         }
         permissions {
           canManageBeds
@@ -102,9 +130,9 @@ export const GET_CURRENT_USER = gql`
         assignedFacility {
           id
           name
+          facilityType
         }
       }
     }
   }
 `;
-

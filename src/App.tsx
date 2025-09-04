@@ -1,35 +1,78 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
+import { RoleBasedRoute } from './components/rbac/RoleBasedRoute';
+import SignIn from "./pages/AuthPages/SignIn";
+import SignUp from "./pages/AuthPages/SignUp";
+import NotFound from "./pages/OtherPage/NotFound";
+import UserProfiles from "./pages/UserProfiles";
+import Videos from "./pages/UiElements/Videos";
+import Images from "./pages/UiElements/Images";
+import Alerts from "./pages/UiElements/Alerts";
+import Badges from "./pages/UiElements/Badges";
+import Avatars from "./pages/UiElements/Avatars";
+import Buttons from "./pages/UiElements/Buttons";
+import LineChart from "./pages/Charts/LineChart";
+import BarChart from "./pages/Charts/BarChart";
+import Calendar from "./pages/Calendar";
+import BasicTables from "./pages/Tables/BasicTables";
+import FormElements from "./pages/Forms/FormElements";
+import Blank from "./pages/Blank";
+import AppLayout from "./layout/AppLayout";
+import { ScrollToTop } from "./components/common/ScrollToTop";
+import Home from "./pages/Dashboard/Home";
 
-function App() {
-  const [count, setCount] = useState(0)
 
+
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1 className='bg-red-500'>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <AppProvider>
+      <Router>
+        <div className="app">
+          <Routes>
+            {/* Public routes */}
+            <Route path='/dashboard' element = {<AppLayout />} />
+            <Route path="/login" element={<div>Login Page</div>} />
+            <Route path="/unauthorized" element={<div>Unauthorized Access</div>} />
+            
+            {/* Protected routes */}
+            <Route
+              path="/dashboard"
+              element={
+                <RoleBasedRoute requiredRole="HOSPITAL_ADMIN">
+                  <div>Hospital Dashboard</div>
+                </RoleBasedRoute>
+              }
+            />
+            
+            <Route
+              path="/bed-management"
+              element={
+                <RoleBasedRoute 
+                  requiredRole="HOSPITAL_ADMIN" 
+                  requiredPermission="canManageBeds"
+                >
+                  <div>Bed Management</div>
+                </RoleBasedRoute>
+              }
+            />
+            
+            <Route
+              path="/ambulance-fleet"
+              element={
+                <RoleBasedRoute 
+                  requiredRole="HOSPITAL_ADMIN"
+                  requiredPermission="canManageAmbulances"
+                >
+                  <div>Ambulance Fleet</div>
+                </RoleBasedRoute>
+              }
+            />
+          </Routes>
+        </div>
+      </Router>
+    </AppProvider>
+  );
+};
 
-export default App
+export default App;

@@ -52,7 +52,6 @@ class ApolloConfigService {
       link: splitLink,
       cache: this.createCache(),
       defaultOptions: this.getDefaultOptions(),
-      connectToDevTools: process.env.NODE_ENV === 'development',
     });
   }
 

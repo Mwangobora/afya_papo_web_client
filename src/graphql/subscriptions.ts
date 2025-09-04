@@ -1,16 +1,22 @@
 import { gql } from "@apollo/client";
 
+
 export const FACILITY_UPDATES = gql`
   subscription FacilityUpdates($facilityId: ID!) {
     facilityUpdates(facilityId: $facilityId) {
+      updateType
+      timestamp
       facility {
         id
         currentOccupancy
         occupancyRate
+        lastUpdated
         bedManagement {
           id
           bedNumber
+          bedType
           status
+          patientAge
           updatedAt
         }
         ambulanceFleet {
@@ -21,10 +27,12 @@ export const FACILITY_UPDATES = gql`
             latitude
             longitude
           }
+          currentDispatch {
+            eta
+            status
+          }
         }
       }
-      updateType
-      timestamp
     }
   }
 `;
@@ -32,19 +40,29 @@ export const FACILITY_UPDATES = gql`
 export const INCIDENT_UPDATES = gql`
   subscription IncidentUpdates($facilityId: ID!) {
     incidentUpdates(facilityId: $facilityId) {
+      updateType
+      timestamp
       incident {
         id
         incidentNumber
         severity
         status
         estimatedArrival
+        patientCount
         assignments {
           id
           status
+          responder {
+            id
+            fullName
+          }
+        }
+        dispatchedAmbulances {
+          id
+          unitNumber
+          status
         }
       }
-      updateType
-      timestamp
     }
   }
 `;
@@ -52,6 +70,7 @@ export const INCIDENT_UPDATES = gql`
 export const INCOMING_PATIENT_ALERTS = gql`
   subscription IncomingPatientAlerts($facilityId: ID!) {
     incomingPatients(facilityId: $facilityId) {
+      timestamp
       alert {
         urgency
         message
@@ -65,62 +84,67 @@ export const INCOMING_PATIENT_ALERTS = gql`
         patientCount
         patientAge
         symptoms
+        location {
+          latitude
+          longitude
+          address
+        }
+        assignments {
+          responder {
+            fullName
+            responderType
+          }
+          status
+        }
+        dispatchedAmbulances {
+          unitNumber
+          equipmentLevel
+        }
       }
-      timestamp
     }
   }
 `;
-export const BED_STATUS = gql`
-  mutation UpdateBedStatus($input: UpdateBedStatusInput!) {
-    updateBedStatus(input: $input) {
+
+export const BED_UPDATES = gql`
+  subscription BedUpdates($facilityId: ID!) {
+    bedUpdates(facilityId: $facilityId) {
+      updateType
+      timestamp
       bed {
         id
         bedNumber
+        bedType
         status
         patientAge
         admissionType
         estimatedDischarge
         updatedAt
       }
-      success
-      errors
     }
   }
 `;
 
-export const DISPATCH_AMBULANCE = gql`
-  mutation DispatchAmbulance($input: DispatchAmbulanceInput!) {
-    dispatchAmbulance(input: $input) {
-      dispatch {
+export const AMBULANCE_UPDATES = gql`
+  subscription AmbulanceUpdates($facilityId: ID!) {
+    ambulanceUpdates(facilityId: $facilityId) {
+      updateType
+      timestamp
+      ambulance {
         id
-        incident {
-          incidentNumber
-        }
-        ambulance {
-          unitNumber
-        }
-        eta
+        unitNumber
         status
-        dispatchedAt
+        currentLocation {
+          latitude
+          longitude
+        }
+        currentDispatch {
+          incident {
+            incidentNumber
+          }
+          eta
+          status
+        }
       }
-      success
-      errors
-    }
-  }
-`;
-
-export const UPDATE_RESOURCE_QUANTITY = gql`
-  mutation UpdateResourceQuantity($input: UpdateResourceQuantityInput!) {
-    updateResourceQuantity(input: $input) {
-      resource {
-        id
-        name
-        currentQuantity
-        status
-        lastUpdated
-      }
-      success
-      errors
     }
   }
 `;

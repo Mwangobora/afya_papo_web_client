@@ -6,18 +6,38 @@ export const GET_FACILITY_DASHBOARD = gql`
       id
       name
       facilityType
+      region
+      district
+      location {
+        latitude
+        longitude
+        address
+        region
+        district
+      }
+      contactInfo {
+        phone
+        email
+        emergencyPhone
+      }
       bedCapacity
       emergencyBeds
       icuBeds
       currentOccupancy
       occupancyRate
       status
+      isOperational
+      lastUpdated
       departments {
         id
         name
         acceptsEmergencies
         currentCaseload
         availableStaff
+        headOfDepartment {
+          id
+          fullName
+        }
       }
       bedManagement {
         id
@@ -37,93 +57,125 @@ export const GET_FACILITY_DASHBOARD = gql`
         unitNumber
         status
         equipmentLevel
+        make
+        model
+        year
         currentLocation {
           latitude
           longitude
         }
         currentDispatch {
+          id
           incident {
+            id
             incidentNumber
           }
           eta
           status
+          dispatchedAt
+        }
+        currentCrew {
+          id
+          responder {
+            id
+            fullName
+            responderType
+          }
+          role
+          isActive
         }
         isOperational
+        lastMaintenance
       }
-      inventory(critical: true) {
+      inventory {
         id
         name
         category
         currentQuantity
         minimumQuantity
+        unit
+        expirationDate
         status
+        lastUpdated
       }
-      lastUpdated
     }
   }
 `;
 
-export const UPDATE_INCIDENT_STATUS = gql`
-  mutation UpdateIncidentStatus($input: UpdateIncidentStatusInput!) {
-    updateIncidentStatus(input: $input) {
-      incident {
+export const UPDATE_BED_STATUS = gql`
+  mutation UpdateBedStatus($input: UpdateBedStatusInput!) {
+    updateBedStatus(input: $input) {
+      success
+      bed {
         id
+        bedNumber
+        bedType
         status
+        hasOxygen
+        hasVentilator
+        hasMonitoring
+        patientAge
+        admissionType
+        estimatedDischarge
         updatedAt
       }
+      errors {
+        field
+        message
+        code
+      }
+    }
+  }
+`;
+
+export const DISPATCH_AMBULANCE = gql`
+  mutation DispatchAmbulance($input: DispatchAmbulanceInput!) {
+    dispatchAmbulance(input: $input) {
       success
-      errors
+      dispatch {
+        id
+        incident {
+          id
+          incidentNumber
+          severity
+        }
+        ambulance {
+          id
+          unitNumber
+          equipmentLevel
+        }
+        eta
+        status
+        dispatchedAt
+      }
+      errors {
+        field
+        message
+        code
+      }
     }
   }
 `;
 
-export const GET_FACILITY_ANALYTICS = gql`
-  query GetFacilityAnalytics($facilityId: ID!, $dateRange: DateRangeInput) {
-    facilityAnalytics(facilityId: $facilityId, dateRange: $dateRange) {
-      totalIncidents
-      resolvedIncidents
-      averageResponseTime
-      bedUtilization {
-        total
-        occupied
-        available
-        rate
-      }
-      ambulanceUtilization {
-        total
-        active
-        available
-        rate
-      }
-      departmentMetrics {
-        departmentId
+export const UPDATE_RESOURCE_QUANTITY = gql`
+  mutation UpdateResourceQuantity($input: UpdateResourceQuantityInput!) {
+    updateResourceQuantity(input: $input) {
+      success
+      resource {
+        id
         name
-        caseload
-        averageWaitTime
+        category
+        currentQuantity
+        minimumQuantity
+        unit
+        status
+        lastUpdated
       }
-    }
-  }
-`;
-
-export const GET_NEARBY_FACILITIES = gql`
-  query GetNearbyFacilities($location: LocationInput!, $radius: Float!, $facilityType: FacilityType) {
-    nearbyFacilities(location: $location, radius: $radius, facilityType: $facilityType) {
-      id
-      name
-      facilityType
-      location {
-        latitude
-        longitude
-        address
+      errors {
+        field
+        message
+        code
       }
-      contactInfo {
-        phone
-        emergencyPhone
-      }
-      currentOccupancy
-      occupancyRate
-      acceptsEmergencies: status
-      distance
     }
   }
 `;

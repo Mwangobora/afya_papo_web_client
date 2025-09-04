@@ -1,14 +1,24 @@
+import {
+  CombinedGraphQLErrors,
+  CombinedProtocolErrors,
+  LocalStateError,
+  ServerError,
+  ServerParseError,
+  UnconventionalError
+} from '@apollo/client/errors';
 
-import { ApolloError } from '@apollo/client';
 import type { ApiError } from '../types/auth.types';
 
 export class ErrorHandler {
-  static formatApolloError(error: ApolloError): ApiError[] {
+  /**
+   * Formats Apollo errors into a consistent structure
+   */
+  static formatApolloError(error: unknown): ApiError[] {
     const errors: ApiError[] = [];
 
     // Handle GraphQL errors
-    if (error.graphQLErrors?.length > 0) {
-      error.graphQLErrors.forEach((gqlError) => {
+    if (CombinedGraphQLErrors.is(error)) {
+      error.errors.forEach(gqlError => {
         errors.push({
           message: gqlError.message,
           code: gqlError.extensions?.code as string,
@@ -17,18 +27,42 @@ export class ErrorHandler {
       });
     }
 
-    // Handle network errors
-    if (error.networkError) {
+    // Handle network/server errors
+    if (ServerError.is(error)) {
       errors.push({
-        message: this.getNetworkErrorMessage(error.networkError),
+        message: this.getNetworkErrorMessage(error),
         code: 'NETWORK_ERROR',
+      });
+    } else if (ServerParseError.is(error)) {
+      errors.push({
+        message: 'Failed to parse server response',
+        code: 'PARSE_ERROR',
+      });
+    } else if (CombinedProtocolErrors.is(error)) {
+      errors.push({
+        message: 'Protocol error during multipart execution',
+        code: 'PROTOCOL_ERROR',
+      });
+    } else if (LocalStateError.is(error)) {
+      errors.push({
+        message: 'Error in local state management',
+        code: 'LOCAL_STATE_ERROR',
+      });
+    } else if (UnconventionalError.is(error)) {
+      errors.push({
+        message: error.message,
+        code: 'UNCONVENTIONAL_ERROR',
       });
     }
 
+    // Fallback if no specific error detected
     return errors.length > 0 ? errors : [{ message: 'An unexpected error occurred' }];
   }
 
-  static getNetworkErrorMessage(networkError: any): string {
+  /**
+   * Maps HTTP status codes to user-friendly messages
+   */
+  static getNetworkErrorMessage(networkError: ServerError): string {
     if (networkError.statusCode) {
       switch (networkError.statusCode) {
         case 400:
@@ -58,29 +92,33 @@ export class ErrorHandler {
     return 'Network error occurred';
   }
 
+  /**
+   * Centralized error handler
+   */
   static handleError(error: unknown): ApiError[] {
-    if (error instanceof ApolloError) {
-      return this.formatApolloError(error);
-    }
-
-    if (error instanceof Error) {
-      return [{ message: error.message }];
-    }
-
-    return [{ message: 'An unexpected error occurred' }];
+    return this.formatApolloError(error);
   }
 
+  /**
+   * Combine multiple error messages into a single string
+   */
   static getErrorMessage(errors: ApiError[]): string {
     if (errors.length === 0) return 'Unknown error';
     if (errors.length === 1) return errors[0].message;
-    
+
     return `Multiple errors: ${errors.map(e => e.message).join(', ')}`;
   }
 
+  /**
+   * Check if a specific field has an error
+   */
   static hasFieldError(errors: ApiError[], field: string): boolean {
     return errors.some(error => error.field === field);
   }
 
+  /**
+   * Get the error message for a specific field
+   */
   static getFieldError(errors: ApiError[], field: string): string | null {
     const error = errors.find(error => error.field === field);
     return error ? error.message : null;

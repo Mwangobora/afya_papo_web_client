@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { PermissionService } from '../services/permission.service';
-import { AdminPermissions, UserType } from '../types/auth.types';
+import type { AdminPermissions, UserType } from '../types/auth.types';
 
 export const usePermissions = () => {
   const { user, permissions } = useAuth();

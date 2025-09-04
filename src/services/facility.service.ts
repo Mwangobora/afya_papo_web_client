@@ -1,20 +1,38 @@
+
 import { apolloClient } from '../config/apollo.config';
 import {
   GET_FACILITY_DASHBOARD,
-  UPDATE_INCIDENT_STATUS,
-} from '../graphql/facility.operations'
-import {
-  BED_STATUS,
+  UPDATE_BED_STATUS,
   DISPATCH_AMBULANCE,
   UPDATE_RESOURCE_QUANTITY,
-} from '../graphql/subscriptions'
-import type{
+} from '../graphql/facility.operations';
+import type {
   Facility,
   BedManagement,
-  Ambulance,
+  BedStatus,
+  Resource,
+  ApiResponse,
 } from '../types/facility.types';
-import type { Resource } from '../types/common.types';
-import type { ApiResponse } from '../types/auth.types';
+import { ErrorHandler } from '../utils/error.utils';
+
+interface UpdateBedStatusInput {
+  bedId: string;
+  status?: BedStatus;
+  patientAge?: number;
+  admissionType?: string;
+  estimatedDischarge?: string;
+}
+
+interface DispatchAmbulanceInput {
+  ambulanceId: string;
+  incidentId: string;
+  priority?: string;
+}
+
+interface UpdateResourceInput {
+  resourceId: string;
+  quantity: number;
+}
 
 export class FacilityService {
   async getFacilityDashboard(facilityId: string): Promise<Facility | null> {
@@ -34,18 +52,12 @@ export class FacilityService {
   }
 
   async updateBedStatus(
-    bedId: string,
-    updates: Partial<BedManagement>
+    input: UpdateBedStatusInput
   ): Promise<ApiResponse<BedManagement>> {
     try {
       const { data } = await apolloClient.mutate({
-        mutation: BED_STATUS,
-        variables: {
-          input: {
-            bedId,
-            ...updates,
-          },
-        },
+        mutation: UPDATE_BED_STATUS,
+        variables: { input },
         errorPolicy: 'all',
       });
 
@@ -53,33 +65,27 @@ export class FacilityService {
 
       return {
         success: result?.success || false,
-        data: result?.bed,
-        errors: result?.errors,
+        data: result?.bed || null,
+        errors: result?.errors || [],
       };
     } catch (error) {
       console.error('Error updating bed status:', error);
+      const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        errors: [{ message: 'Failed to update bed status' }],
+        data: null,
+        errors,
       };
     }
   }
 
   async dispatchAmbulance(
-    ambulanceId: string,
-    incidentId: string,
-    priority: string = 'EMERGENCY'
+    input: DispatchAmbulanceInput
   ): Promise<ApiResponse> {
     try {
       const { data } = await apolloClient.mutate({
         mutation: DISPATCH_AMBULANCE,
-        variables: {
-          input: {
-            ambulanceId,
-            incidentId,
-            priority,
-          },
-        },
+        variables: { input },
         errorPolicy: 'all',
       });
 
@@ -87,31 +93,27 @@ export class FacilityService {
 
       return {
         success: result?.success || false,
-        data: result?.dispatch,
-        errors: result?.errors,
+        data: result?.dispatch || null,
+        errors: result?.errors || [],
       };
     } catch (error) {
       console.error('Error dispatching ambulance:', error);
+      const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        errors: [{ message: 'Failed to dispatch ambulance' }],
+        data: null,
+        errors,
       };
     }
   }
 
   async updateResourceQuantity(
-    resourceId: string,
-    quantity: number
+    input: UpdateResourceInput
   ): Promise<ApiResponse<Resource>> {
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_RESOURCE_QUANTITY,
-        variables: {
-          input: {
-            resourceId,
-            quantity,
-          },
-        },
+        variables: { input },
         errorPolicy: 'all',
       });
 
@@ -119,14 +121,16 @@ export class FacilityService {
 
       return {
         success: result?.success || false,
-        data: result?.resource,
-        errors: result?.errors,
+        data: result?.resource || null,
+        errors: result?.errors || [],
       };
     } catch (error) {
       console.error('Error updating resource quantity:', error);
+      const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        errors: [{ message: 'Failed to update resource quantity' }],
+        data: null,
+        errors,
       };
     }
   }

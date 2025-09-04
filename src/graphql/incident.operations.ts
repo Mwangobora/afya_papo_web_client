@@ -1,9 +1,89 @@
-import { gql } from '@apollo/client'
+import { gql } from "@apollo/client";
 
 export const GET_ACTIVE_INCIDENTS = gql`
-  query GetActiveIncidents($facilityId: ID!, $filters: IncidentFilters) {
-    incidents(facilityId: $facilityId, filters: $filters) {
+  query GetActiveIncidents(
+    $facilityId: ID!
+    $filters: IncidentFilters
+    $limit: Int
+    $offset: Int
+  ) {
+    incidents(
+      facilityId: $facilityId
+      filters: $filters
+      limit: $limit
+      offset: $offset
+    ) {
       data {
+        id
+        incidentNumber
+        incidentType
+        severity
+        status
+        location {
+          latitude
+          longitude
+          address
+          region
+          district
+        }
+        patientCount
+        patientAge
+        symptoms
+        estimatedArrival
+        assignments {
+          id
+          responder {
+            id
+            fullName
+            responderType
+          }
+          role
+          status
+          assignedAt
+          arrivedAt
+        }
+        timeline {
+          id
+          eventType
+          description
+          timestamp
+          createdBy {
+            id
+            fullName
+          }
+        }
+        dispatchedAmbulances {
+          id
+          unitNumber
+          status
+          equipmentLevel
+          currentLocation {
+            latitude
+            longitude
+          }
+        }
+        destinationFacility {
+          id
+          name
+          facilityType
+        }
+        createdAt
+        updatedAt
+      }
+      totalCount
+      hasNextPage
+      hasPreviousPage
+      currentPage
+      totalPages
+    }
+  }
+`;
+
+export const CREATE_INCIDENT = gql`
+  mutation CreateIncident($input: CreateIncidentInput!) {
+    createIncident(input: $input) {
+      success
+      incident {
         id
         incidentNumber
         incidentType
@@ -17,56 +97,38 @@ export const GET_ACTIVE_INCIDENTS = gql`
         patientCount
         patientAge
         symptoms
-        estimatedArrival
-        assignments {
-          id
-          responder {
-            fullName
-            responderType
-          }
-          role
-          status
-          assignedAt
-        }
-        dispatchedAmbulances {
-          id
-          unitNumber
-          status
-          equipmentLevel
-        }
-        destinationFacility {
-          id
-          name
-        }
         createdAt
-        updatedAt
       }
-      totalCount
-      hasNextPage
+      errors {
+        field
+        message
+        code
+      }
     }
   }
 `;
 
-export const CREATE_INCIDENT = gql`
-  mutation CreateIncident($input: CreateIncidentInput!) {
-    createIncident(input: $input) {
+export const UPDATE_INCIDENT_STATUS = gql`
+  mutation UpdateIncidentStatus($input: UpdateIncidentStatusInput!) {
+    updateIncidentStatus(input: $input) {
+      success
       incident {
         id
         incidentNumber
-        incidentType
-        severity
         status
-        location {
-          latitude
-          longitude
-          address
+        updatedAt
+        timeline {
+          id
+          eventType
+          description
+          timestamp
         }
-        patientCount
-        createdAt
       }
-      success
-      errors
+      errors {
+        field
+        message
+        code
+      }
     }
   }
 `;
-

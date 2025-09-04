@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import type { UserType, AdminPermissions } from '../types/auth.types';
 
 interface UseAuthGuardOptions {

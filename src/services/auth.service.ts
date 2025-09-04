@@ -12,6 +12,7 @@ import type {
   LoginResponse, 
   AuthTokens 
 } from '../types/auth.types';
+import { ErrorHandler } from '../utils/error.utils';
 
 export class AuthService {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
@@ -30,7 +31,7 @@ export class AuthService {
 
       const result = data?.adminLogin;
 
-      if (result?.success) {
+      if (result?.success && result.user && result.accessToken) {
         return {
           success: true,
           user: result.user,
@@ -48,9 +49,10 @@ export class AuthService {
       }
     } catch (error) {
       console.error('Login error:', error);
+      const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        errors: ['Network error occurred during login'],
+        errors: errors.map(e => e.message),
       };
     }
   }
@@ -65,7 +67,7 @@ export class AuthService {
 
       const result = data?.refreshToken;
 
-      if (result?.success) {
+      if (result?.success && result.accessToken) {
         return {
           accessToken: result.accessToken,
           refreshToken: result.refreshToken,
@@ -89,7 +91,6 @@ export class AuthService {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // Clear Apollo cache
       await apolloClient.clearStore();
     }
   }
@@ -106,15 +107,6 @@ export class AuthService {
     } catch (error) {
       console.error('Get current user error:', error);
       return null;
-    }
-  }
-
-  async verifyToken(): Promise<boolean> {
-    try {
-      const user = await this.getCurrentUser();
-      return !!user;
-    } catch (error) {
-      return false;
     }
   }
 }

@@ -3,7 +3,7 @@ import { useSubscription } from '@apollo/client/react';
 import { FacilityService } from '../services/facility.service';
 import { FACILITY_UPDATES } from '../graphql/subscriptions';
 import type { Facility, BedManagement } from '../types/facility.types';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../context/AuthContext';
 
 export const useFacility = (facilityId?: string) => {
   const { user } = useAuth();

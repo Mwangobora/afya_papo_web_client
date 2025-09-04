@@ -1,19 +1,20 @@
-// src/services/incident.service.ts
+
 import { apolloClient } from '../config/apollo.config';
 import {
   GET_ACTIVE_INCIDENTS,
   CREATE_INCIDENT,
+  UPDATE_INCIDENT_STATUS,
 } from '../graphql/incident.operations';
-import { UPDATE_INCIDENT_STATUS } from '../graphql/facility.operations';
-
-import type { PaginatedResponse, ApiResponse } from '../types/auth.types';
 import type {
   Incident,
   IncidentType,
   SeverityLevel,
   IncidentStatus,
+
 } from '../types/incident.types';
-import type { Location } from '../types/common.types';
+import type { Location, ApiResponse, Resource, PaginatedResponse } from '../types';
+
+import { ErrorHandler } from '../utils/error.utils';
 
 interface IncidentFilters {
   status?: IncidentStatus[];
@@ -33,6 +34,12 @@ interface CreateIncidentInput {
   patientAge?: number;
   symptoms?: string;
   description?: string;
+}
+
+interface UpdateIncidentStatusInput {
+  incidentId: string;
+  status: IncidentStatus;
+  notes?: string;
 }
 
 export class IncidentService {
@@ -57,13 +64,24 @@ export class IncidentService {
 
       const incidents = data?.incidents;
 
+      if (!incidents) {
+        return {
+          data: [],
+          totalCount: 0,
+          hasNextPage: false,
+          hasPreviousPage: false,
+          currentPage: 1,
+          totalPages: 0,
+        };
+      }
+
       return {
-        data: incidents?.data || [],
-        totalCount: incidents?.totalCount || 0,
-        hasNextPage: incidents?.hasNextPage || false,
-        hasPreviousPage: offset > 0,
-        currentPage: Math.floor(offset / limit) + 1,
-        totalPages: Math.ceil((incidents?.totalCount || 0) / limit),
+        data: incidents.data || [],
+        totalCount: incidents.totalCount || 0,
+        hasNextPage: incidents.hasNextPage || false,
+        hasPreviousPage: incidents.hasPreviousPage || false,
+        currentPage: incidents.currentPage || 1,
+        totalPages: incidents.totalPages || 0,
       };
     } catch (error) {
       console.error('Error fetching active incidents:', error);
@@ -90,33 +108,27 @@ export class IncidentService {
 
       return {
         success: result?.success || false,
-        data: result?.incident,
-        errors: result?.errors,
+        data: result?.incident || null,
+        errors: result?.errors || [],
       };
     } catch (error) {
       console.error('Error creating incident:', error);
+      const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        errors: [{ message: 'Failed to create incident' }],
+        data: null,
+        errors,
       };
     }
   }
 
   async updateIncidentStatus(
-    incidentId: string,
-    status: IncidentStatus,
-    notes?: string
+    input: UpdateIncidentStatusInput
   ): Promise<ApiResponse<Incident>> {
     try {
       const { data } = await apolloClient.mutate({
         mutation: UPDATE_INCIDENT_STATUS,
-        variables: {
-          input: {
-            incidentId,
-            status,
-            notes,
-          },
-        },
+        variables: { input },
         errorPolicy: 'all',
       });
 
@@ -124,69 +136,17 @@ export class IncidentService {
 
       return {
         success: result?.success || false,
-        data: result?.incident,
-        errors: result?.errors,
+        data: result?.incident || null,
+        errors: result?.errors || [],
       };
     } catch (error) {
       console.error('Error updating incident status:', error);
+      const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        errors: [{ message: 'Failed to update incident status' }],
+        data: null,
+        errors,
       };
-    }
-  }
-
-  async getIncidentById(incidentId: string): Promise<Incident | null> {
-    try {
-      const { data } = await apolloClient.query({
-        query: GET_ACTIVE_INCIDENTS,
-        variables: {
-          filters: { id: incidentId },
-        },
-        errorPolicy: 'all',
-        fetchPolicy: 'network-only',
-      });
-
-      const incidents = data?.incidents?.data;
-      return incidents?.[0] || null;
-    } catch (error) {
-      console.error('Error fetching incident by ID:', error);
-      return null;
-    }
-  }
-
-  async getIncidentsByStatus(
-    facilityId: string,
-    status: IncidentStatus[]
-  ): Promise<Incident[]> {
-    try {
-      const response = await this.getActiveIncidents(facilityId, { status });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching incidents by status:', error);
-      return [];
-    }
-  }
-
-  async searchIncidents(
-    facilityId: string,
-    searchTerm: string,
-    filters?: IncidentFilters
-  ): Promise<Incident[]> {
-    try {
-      const response = await this.getActiveIncidents(facilityId, {
-        ...filters,
-        // Add search functionality when backend supports it
-      });
-      
-      // Client-side filtering for now
-      return response.data.filter(incident =>
-        incident.incidentNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        incident.symptoms?.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    } catch (error) {
-      console.error('Error searching incidents:', error);
-      return [];
     }
   }
 }

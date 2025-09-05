@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './guards/ProtectedRoute';
 import { RoleBasedRoute } from './guards/RoleBasedRoute';
-import { UserType } from '../types/auth.types';
+import AppLayout from '../layout/AppLayout';
 
 // Lazy load all page components
 import {
@@ -122,53 +122,55 @@ export const AppRoutes: React.FC = () => {
         } 
       />
       
-      {/* Main Dashboard - Role-based routing */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute>
-                <Home />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
-        }
-      />
+      {/* Protected Routes with Layout */}
+      <Route element={<AppLayout />}>
+        {/* Main Dashboard - Role-based routing */}
+        <Route
+          path="/dashboard"
+          element={
+          // <ProtectedRoute>
+              <SuspenseWrapper>
+                <RoleBasedRoute>
+                  <Home />
+                </RoleBasedRoute>
+              </SuspenseWrapper>
+            // </ProtectedRoute>
+          }
+        />
       
-      {/* Emergency Response Routes */}
-      <Route
-        path="/emergency"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={[UserType.HOSPITAL_ADMIN, UserType.DISPATCHER, UserType.RESPONDER]}>
-                <EmergencyDashboard />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
-        }
-      />
-      
-      <Route
-        path="/incidents"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={[UserType.HOSPITAL_ADMIN, UserType.DISPATCHER, UserType.RESPONDER]}>
-                <IncidentManagement />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
-        }
-      />
+        {/* Emergency Response Routes */}
+        <Route
+          path="/emergency"
+          element={
+            <ProtectedRoute>
+              <SuspenseWrapper>
+                <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
+                  <EmergencyDashboard />
+                </RoleBasedRoute>
+              </SuspenseWrapper>
+            </ProtectedRoute>
+          }
+        />
+        
+        <Route
+          path="/incidents"
+          element={
+            <ProtectedRoute>
+              <SuspenseWrapper>
+                <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
+                  <IncidentManagement />
+                </RoleBasedRoute>
+              </SuspenseWrapper>
+            </ProtectedRoute>
+          }
+        />
       
       <Route
         path="/incidents/active"
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={[UserType.HOSPITAL_ADMIN, UserType.DISPATCHER, UserType.RESPONDER]}>
+              <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
                 <ActiveIncidents />
               </RoleBasedRoute>
             </SuspenseWrapper>
@@ -181,7 +183,7 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={[UserType.HOSPITAL_ADMIN, UserType.DISPATCHER]}>
+              <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER']}>
                 <CreateIncident />
               </RoleBasedRoute>
             </SuspenseWrapper>
@@ -194,7 +196,7 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={[UserType.HOSPITAL_ADMIN, UserType.DISPATCHER, UserType.RESPONDER]}>
+              <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
                 <IncidentDetails />
               </RoleBasedRoute>
             </SuspenseWrapper>
@@ -208,7 +210,7 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={UserType.HOSPITAL_ADMIN}>
+              <RoleBasedRoute requiredRole="HOSPITAL_ADMIN">
                 <FacilityDashboard />
               </RoleBasedRoute>
             </SuspenseWrapper>
@@ -222,7 +224,7 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute 
-                requiredRole={UserType.HOSPITAL_ADMIN} 
+                requiredRole="HOSPITAL_ADMIN" 
                 requiredPermission="canManageBeds"
               >
                 <BedManagement />
@@ -238,7 +240,7 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute 
-                requiredRole={UserType.HOSPITAL_ADMIN} 
+                requiredRole="HOSPITAL_ADMIN" 
                 requiredPermission="canManageAmbulances"
               >
                 <AmbulanceFleet />
@@ -254,7 +256,7 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute 
-                requiredRole={UserType.HOSPITAL_ADMIN} 
+                requiredRole="HOSPITAL_ADMIN" 
                 requiredPermission="canManageResources"
               >
                 <ResourceManagement />
@@ -270,7 +272,7 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={UserType.RESPONDER}>
+              <RoleBasedRoute requiredRole="RESPONDER">
                 <ResponderDashboard />
               </RoleBasedRoute>
             </SuspenseWrapper>
@@ -283,7 +285,7 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={UserType.RESPONDER}>
+              <RoleBasedRoute requiredRole="RESPONDER">
                 <MyAssignments />
               </RoleBasedRoute>
             </SuspenseWrapper>
@@ -296,7 +298,7 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={UserType.RESPONDER}>
+              <RoleBasedRoute requiredRole="RESPONDER">
                 <UpdateLocation />
               </RoleBasedRoute>
             </SuspenseWrapper>
@@ -310,7 +312,7 @@ export const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={UserType.DISPATCHER}>
+              <RoleBasedRoute requiredRole="DISPATCHER">
                 <DispatcherDashboard />
               </RoleBasedRoute>
             </SuspenseWrapper>
@@ -324,7 +326,7 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute 
-                requiredRole={UserType.DISPATCHER} 
+                requiredRole="DISPATCHER" 
                 requiredPermission="assign_responders"
               >
                 <AssignResponders />
@@ -340,7 +342,7 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute 
-                requiredRole={UserType.DISPATCHER} 
+                requiredRole="DISPATCHER" 
                 requiredPermission="coordinate_emergencies"
               >
                 <CoordinateEmergency />
@@ -357,7 +359,7 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute 
-                requiredRole={[UserType.HOSPITAL_ADMIN, UserType.DISPATCHER]} 
+                requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER']} 
                 requiredPermission="view_analytics"
               >
                 <Analytics />
@@ -373,7 +375,7 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute 
-                requiredRole={[UserType.HOSPITAL_ADMIN, UserType.DISPATCHER]} 
+                requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER']} 
                 requiredPermission="canGenerateReports"
               >
                 <Reports />
@@ -408,16 +410,17 @@ export const AppRoutes: React.FC = () => {
             </SuspenseWrapper>
           </ProtectedRoute>
         }
-      />
+        />
+      </Route>
       
       {/* Catch all route */}
-      <Route 
-        path="*" 
+      <Route
+        path="*"
         element={
           <SuspenseWrapper>
             <NotFound />
           </SuspenseWrapper>
-        } 
+        }
       />
     </Routes>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useRBAC } from '../../hooks/useRBAC';
-import { UserType } from '../../types/auth.types';
+import type{ UserType } from '../../types/auth.types';
 
 interface RoleBasedRouteProps {
   children: React.ReactNode;

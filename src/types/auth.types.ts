@@ -76,17 +76,25 @@ export interface AdminPermissions {
   canManageAmbulances: boolean;
 }
 
-export type UserType = 
-  | 'CITIZEN' 
-  | 'RESPONDER' 
-  | 'HOSPITAL_ADMIN' 
-  | 'SYSTEM_ADMIN'
-  | 'DISPATCHER';
+  export type UserType = 
+    | 'CITIZEN' 
+    | 'RESPONDER' 
+    | 'HOSPITAL_ADMIN' 
+    | 'SYSTEM_ADMIN'
+    | 'DISPATCHER';
+
+    export const UserTypes = {
+  CITIZEN: 'CITIZEN' as UserType,
+  RESPONDER: 'RESPONDER' as UserType,
+  HOSPITAL_ADMIN: 'HOSPITAL_ADMIN' as UserType,
+  SYSTEM_ADMIN: 'SYSTEM_ADMIN' as UserType,
+  DISPATCHER: 'DISPATCHER' as UserType,
+};
 
 export type ResponderType = 
   | 'DOCTOR'
   | 'NURSE'
-  | 'PARAMEDIC'
+  | 'PARAMEDIC' 
   | 'CLINICAL_OFFICER'
   | 'MEDICAL_ASSISTANT';
 

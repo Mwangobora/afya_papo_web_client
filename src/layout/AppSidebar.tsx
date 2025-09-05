@@ -1,20 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { LayoutDashboard,BadgeAlert,CircleUser,Cuboid,Bus,BadgeInfo, ChartPie, CodeSquareIcon, Plug, Menu, GripHorizontalIcon } from "lucide-react";
 import { Link, useLocation } from "react-router";
 
-// Assume these icons are imported from an icon library
-import {
-  BoxCubeIcon,
-  CalenderIcon,
-  ChevronDownIcon,
-  GridIcon,
-  HorizontaLDots,
-  ListIcon,
-  PageIcon,
-  PieChartIcon,
-  PlugInIcon,
-  TableIcon,
-  UserCircleIcon,
-} from "../icons";
+
 import { useSidebar } from "../context/SidebarContext";
 import SidebarWidget from "./SidebarWidget";
 
@@ -27,43 +15,46 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   {
-    icon: <GridIcon />,
+    icon: <LayoutDashboard />,
     name: "Dashboard",
-    subItems: [{ name: "Ecommerce", path: "/", pro: false }],
+    path:'/home'
   },
   {
-    icon: <CalenderIcon />,
-    name: "Calendar",
-    path: "/calendar",
+    icon: <BadgeAlert />,
+    name: "Incidents",
+    path: "/icidents",
   },
   {
-    icon: <UserCircleIcon />,
-    name: "User Profile",
-    path: "/profile",
+    icon: <Cuboid />,
+    name: "Facility management",
+    path: "/facility",
   },
   {
-    name: "Forms",
-    icon: <ListIcon />,
-    subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
+    name: "Responders",
+    icon: <CircleUser />,
+    // subItems: [{ name: "Form Elements", path: "/responders", pro: false }],
+    path:"/responders"
   },
   {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [{ name: "Basic Tables", path: "/basic-tables", pro: false }],
+    name: "Dispachers",
+    icon: <Bus />,
+    // subItems: [{ name: "Basic Tables", path: "/Dispachers", pro: false }],
+    path:"/dispachers"
   },
   {
-    name: "Pages",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "Blank Page", path: "/blank", pro: false },
-      { name: "404 Error", path: "/error-404", pro: false },
-    ],
+    name: "Analytics",
+    icon: <BadgeInfo />,
+    // subItems: [
+    //   { name: "Blank Page", path: "/blank", pro: false },
+    //   { name: "404 Error", path: "/error-404", pro: false },
+    // ],
+    path:"/analytics"
   },
 ];
 
 const othersItems: NavItem[] = [
   {
-    icon: <PieChartIcon />,
+    icon: <ChartPie />,
     name: "Charts",
     subItems: [
       { name: "Line Chart", path: "/line-chart", pro: false },
@@ -71,7 +62,7 @@ const othersItems: NavItem[] = [
     ],
   },
   {
-    icon: <BoxCubeIcon />,
+    icon: <CodeSquareIcon />,
     name: "UI Elements",
     subItems: [
       { name: "Alerts", path: "/alerts", pro: false },
@@ -83,7 +74,7 @@ const othersItems: NavItem[] = [
     ],
   },
   {
-    icon: <PlugInIcon />,
+    icon: <Plug />,
     name: "Authentication",
     subItems: [
       { name: "Sign In", path: "/signin", pro: false },
@@ -190,7 +181,7 @@ const AppSidebar: React.FC = () => {
                 <span className="menu-item-text">{nav.name}</span>
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
+                <Menu
                   className={`ml-auto w-5 h-5 transition-transform duration-200 ${
                     openSubmenu?.type === menuType &&
                     openSubmenu?.index === index
@@ -345,7 +336,7 @@ const AppSidebar: React.FC = () => {
                 {isExpanded || isHovered || isMobileOpen ? (
                   "Menu"
                 ) : (
-                  <HorizontaLDots className="size-6" />
+                  <GripHorizontalIcon className="size-6" />
                 )}
               </h2>
               {renderMenuItems(navItems, "main")}
@@ -361,7 +352,7 @@ const AppSidebar: React.FC = () => {
                 {isExpanded || isHovered || isMobileOpen ? (
                   "Others"
                 ) : (
-                  <HorizontaLDots />
+                  <GripHorizontalIcon />
                 )}
               </h2>
               {renderMenuItems(othersItems, "others")}

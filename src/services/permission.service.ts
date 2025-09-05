@@ -40,7 +40,7 @@ export class PermissionService {
   }
 
   isEmergencyResponder(): boolean {
-    return this.hasRole('EMERGENCY_RESPONDER');
+    return this.hasRole('RESPONDER');
   }
 
   isSystemAdmin(): boolean {

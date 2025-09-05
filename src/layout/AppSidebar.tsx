@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LayoutDashboard,BadgeAlert,CircleUser,Cuboid,Bus,BadgeInfo, ChartPie, CodeSquareIcon, Plug, Menu, GripHorizontalIcon } from "lucide-react";
-import { Link, useLocation } from "react-router";
+import { Link, useLocation } from "react-router-dom";
 
 
 import { useSidebar } from "../context/SidebarContext";
@@ -17,12 +17,12 @@ const navItems: NavItem[] = [
   {
     icon: <LayoutDashboard />,
     name: "Dashboard",
-    path:'/home'
+    path:'/dashboard'
   },
   {
     icon: <BadgeAlert />,
     name: "Incidents",
-    path: "/icidents",
+    path: "/incidents",
   },
   {
     icon: <Cuboid />,
@@ -36,10 +36,10 @@ const navItems: NavItem[] = [
     path:"/responders"
   },
   {
-    name: "Dispachers",
+    name: "Dispatchers",
     icon: <Bus />,
-    // subItems: [{ name: "Basic Tables", path: "/Dispachers", pro: false }],
-    path:"/dispachers"
+    // subItems: [{ name: "Basic Tables", path: "/dispatchers", pro: false }],
+    path:"/dispatcher"
   },
   {
     name: "Analytics",

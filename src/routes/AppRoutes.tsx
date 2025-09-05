@@ -17,11 +17,11 @@ import {
 } from './pages/DashboardPages';
 
 import {
-  IncidentManagement,
   ActiveIncidents,
   IncidentDetails,
   CreateIncident
 } from './pages/EmergencyPages';
+import Incidents from '../components/incidents/Incidents';
 
 import {
   FacilityDashboard,
@@ -41,6 +41,8 @@ import {
   AssignResponders,
   CoordinateEmergency
 } from './pages/DispatcherPages';
+import Responders from '../components/responders/Responders';
+import Dispatchers from '../components/dispatch/Dispatchers';
 
 import {
   Analytics,
@@ -158,7 +160,7 @@ export const AppRoutes: React.FC = () => {
             <ProtectedRoute>
               <SuspenseWrapper>
                 <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
-                  <IncidentManagement />
+                  <Incidents />
                 </RoleBasedRoute>
               </SuspenseWrapper>
             </ProtectedRoute>
@@ -268,12 +270,12 @@ export const AppRoutes: React.FC = () => {
       
       {/* Responder Routes */}
       <Route
-        path="/responder"
+        path="/responders"
         element={
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute requiredRole="RESPONDER">
-                <ResponderDashboard />
+                <Responders />
               </RoleBasedRoute>
             </SuspenseWrapper>
           </ProtectedRoute>
@@ -313,7 +315,7 @@ export const AppRoutes: React.FC = () => {
           <ProtectedRoute>
             <SuspenseWrapper>
               <RoleBasedRoute requiredRole="DISPATCHER">
-                <DispatcherDashboard />
+                <Dispatchers />
               </RoleBasedRoute>
             </SuspenseWrapper>
           </ProtectedRoute>

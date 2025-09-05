@@ -65,7 +65,7 @@ export class IncidentService {
     offset: number = 0
   ): Promise<PaginatedResponse<Incident>> {
     try {
-      const { data } = await apolloClient.query({
+      const { data } = await apolloClient.query<{ incidents: Incident[] }>({
         query: GET_ACTIVE_INCIDENTS,
         variables: {
           facilityId,
@@ -102,7 +102,9 @@ export class IncidentService {
 
   async createIncident(input: CreateIncidentInput): Promise<ApiResponse<Incident>> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        createIncident: { success: boolean; incident?: Incident; errors?: string[] };
+      }>({
         mutation: CREATE_INCIDENT,
         variables: { input },
         errorPolicy: 'all',
@@ -113,7 +115,9 @@ export class IncidentService {
       return {
         success: result?.success || false,
         data: result?.incident || undefined,
-        errors: result?.errors || [],
+        errors: (result?.errors ?? []).map((e: any) =>
+          typeof e === 'string' ? { message: e } : e
+        ),
       };
     } catch (error) {
       console.error('Error creating incident:', error);
@@ -130,7 +134,9 @@ export class IncidentService {
     input: UpdateIncidentStatusInput
   ): Promise<ApiResponse<Incident>> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        updateIncidentStatus: { success: boolean; incident?: Incident; errors?: string[] };
+      }>({
         mutation: UPDATE_INCIDENT_STATUS,
         variables: { input },
         errorPolicy: 'all',
@@ -141,7 +147,9 @@ export class IncidentService {
       return {
         success: result?.success || false,
         data: result?.incident || undefined,
-        errors: result?.errors || [],
+        errors: (result?.errors ?? []).map((e: any) =>
+          typeof e === 'string' ? { message: e } : e
+        ),
       };
     } catch (error) {
       console.error('Error updating incident status:', error);
@@ -156,23 +164,25 @@ export class IncidentService {
 
   async getIncidentDetails(incidentId: string): Promise<Incident | null> {
     try {
-      const { data } = await apolloClient.query({
+      const { data } = await apolloClient.query<{ incident: Incident | null }>({
         query: GET_INCIDENT_DETAILS,
         variables: { id: incidentId },
         errorPolicy: 'all',
         fetchPolicy: 'cache-first',
       });
 
-      return data?.incident || undefined;
+      return data?.incident ?? null;
     } catch (error) {
       console.error('Error fetching incident details:', error);
-      return undefined;
+      return null;
     }
   }
 
   async acceptAssignment(assignmentId: string): Promise<ApiResponse<unknown>> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        acceptAssignment: { success: boolean; errors?: string[] } & Record<string, unknown>;
+      }>({
         mutation: ACCEPT_ASSIGNMENT,
         variables: { assignmentId },
         errorPolicy: 'all',
@@ -183,7 +193,9 @@ export class IncidentService {
       return {
         success: result?.success || false,
         data: result || null,
-        errors: result?.errors || [],
+        errors: (result?.errors ?? []).map((e: any) =>
+          typeof e === 'string' ? { message: e } : e
+        ),
       };
     } catch (error) {
       console.error('Error accepting assignment:', error);
@@ -198,7 +210,9 @@ export class IncidentService {
 
   async declineAssignment(input: DeclineAssignmentInput): Promise<ApiResponse<unknown>> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        declineAssignment: { success: boolean; errors?: string[] } & Record<string, unknown>;
+      }>({
         mutation: DECLINE_ASSIGNMENT,
         variables: { input },
         errorPolicy: 'all',
@@ -209,7 +223,9 @@ export class IncidentService {
       return {
         success: result?.success || false,
         data: result || null,
-        errors: result?.errors || [],
+        errors: (result?.errors ?? []).map((e: any) =>
+          typeof e === 'string' ? { message: e } : e
+        ),
       };
     } catch (error) {
       console.error('Error declining assignment:', error);
@@ -224,7 +240,9 @@ export class IncidentService {
 
   async updateResponderLocation(location: Location): Promise<ApiResponse<unknown>> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        updateResponderLocation: { success: boolean; errors?: string[] } & Record<string, unknown>;
+      }>({
         mutation: UPDATE_RESPONDER_LOCATION,
         variables: { location },
         errorPolicy: 'all',
@@ -235,7 +253,9 @@ export class IncidentService {
       return {
         success: result?.success || false,
         data: result || null,
-        errors: result?.errors || [],
+        errors: (result?.errors ?? []).map((e: any) =>
+          typeof e === 'string' ? { message: e } : e
+        ),
       };
     } catch (error) {
       console.error('Error updating responder location:', error);

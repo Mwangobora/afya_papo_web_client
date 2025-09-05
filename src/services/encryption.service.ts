@@ -1,5 +1,7 @@
+import { Env } from '../config/env';
+
 export class EncryptionService {
-  private static readonly SECRET_KEY = import.meta.env.VITE_ENCRYPTION_KEY || 'default-secret-key';
+  private static readonly SECRET_KEY = Env.VITE_ENCRYPTION_KEY;
 
   static encrypt(data: string): string {
     try {

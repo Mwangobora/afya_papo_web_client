@@ -3,9 +3,10 @@ import type { UserType } from "../types/auth.types";
 export class RoleService {
   private static readonly ROLE_HIERARCHY: Record<UserType, number> = {
     'CITIZEN': 1,
-    'EMERGENCY_RESPONDER': 2,
+    'RESPONDER': 2,
     'HOSPITAL_ADMIN': 3,
     'SYSTEM_ADMIN': 4,
+    'DISPATCHER': 3,
   };
   
 
@@ -32,9 +33,10 @@ export class RoleService {
   static getRoleDisplayName(role: UserType): string {
     const roleNames: Record<UserType, string> = {
       'CITIZEN': 'Citizen',
-      'EMERGENCY_RESPONDER': 'Emergency Responder',
+      'RESPONDER': 'Emergency Responder',
       'HOSPITAL_ADMIN': 'Hospital Administrator',
       'SYSTEM_ADMIN': 'System Administrator',
+      'DISPATCHER': 'Dispatcher',
     };
 
     return roleNames[role] || role;
@@ -43,7 +45,7 @@ export class RoleService {
   static getRolePermissions(role: UserType): string[] {
     const rolePermissions: Record<UserType, string[]> = {
       'CITIZEN': ['create_emergency_report'],
-      'EMERGENCY_RESPONDER': [
+      'RESPONDER': [
         'create_emergency_report',
         'respond_to_incidents',
         'update_incident_status',
@@ -64,6 +66,12 @@ export class RoleService {
         'system_configuration',
         'access_all_data',
         'generate_system_reports'
+      ],
+      'DISPATCHER': [
+        'view_facility_dashboard',
+        'dispatch_ambulances',
+        'assign_responders',
+        'monitor_incidents'
       ],
     };
 

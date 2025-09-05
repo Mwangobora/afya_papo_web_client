@@ -82,7 +82,7 @@ export class RBACService {
 
     // Emergency responders can access their assigned facility
     if (user.userType === 'RESPONDER') {
-      return user.emergencyResponderProfile?.primaryHospital?.id === facilityId;
+      return user.emergencyResponderProfile?.assignedFacility?.id === facilityId;
     }
 
     return false;
@@ -100,8 +100,8 @@ export class RBACService {
       facilityIds.push(user.hospitalAdminProfile.primaryFacility.id);
     }
 
-    if (user.emergencyResponderProfile?.primaryHospital?.id) {
-      facilityIds.push(user.emergencyResponderProfile.primaryHospital.id);
+    if (user.emergencyResponderProfile?.assignedFacility?.id) {
+      facilityIds.push(user.emergencyResponderProfile.assignedFacility.id);
     }
 
     return facilityIds;

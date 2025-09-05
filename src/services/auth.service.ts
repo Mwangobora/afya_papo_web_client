@@ -21,7 +21,15 @@ import { ErrorHandler } from '../utils/error.utils';
 export class AuthService {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        login: {
+          success: boolean;
+          user?: User;
+          accessToken?: string;
+          refreshToken?: string;
+          errors?: string[];
+        };
+      }>({
         mutation: LOGIN,
         variables: {
           input: {
@@ -35,7 +43,7 @@ export class AuthService {
 
       const result = data?.login;
 
-      if (result?.success && result.user && result.accessToken) {
+      if (result?.success && result.user && result.accessToken && result.refreshToken) {
         return {
           success: true,
           user: result.user,
@@ -63,7 +71,15 @@ export class AuthService {
 
   async register(input: RegisterInput): Promise<LoginResponse> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        register: {
+          success: boolean;
+          user?: User;
+          accessToken?: string;
+          refreshToken?: string;
+          errors?: string[];
+        };
+      }>({
         mutation: REGISTER,
         variables: { input },
         errorPolicy: 'all',
@@ -71,7 +87,7 @@ export class AuthService {
 
       const result = data?.register;
 
-      if (result?.success && result.user && result.accessToken) {
+      if (result?.success && result.user && result.accessToken && result.refreshToken) {
         return {
           success: true,
           user: result.user,
@@ -99,7 +115,15 @@ export class AuthService {
 
   async verifyPhone(input: VerifyPhoneInput): Promise<LoginResponse> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        verifyPhone: {
+          success: boolean;
+          user?: User;
+          accessToken?: string;
+          refreshToken?: string;
+          errors?: string[];
+        };
+      }>({
         mutation: VERIFY_PHONE,
         variables: { input },
         errorPolicy: 'all',
@@ -107,7 +131,7 @@ export class AuthService {
 
       const result = data?.verifyPhone;
 
-      if (result?.success && result.user && result.accessToken) {
+      if (result?.success && result.user && result.accessToken && result.refreshToken) {
         return {
           success: true,
           user: result.user,
@@ -135,7 +159,14 @@ export class AuthService {
 
   async refreshToken(refreshToken: string): Promise<AuthTokens | null> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        refreshToken: {
+          success: boolean;
+          accessToken: string;
+          refreshToken: string;
+          expiresAt: string;
+        };
+      }>({
         mutation: REFRESH_TOKEN,
         variables: { refreshToken },
         errorPolicy: 'all',
@@ -173,7 +204,7 @@ export class AuthService {
 
   async getCurrentUser(): Promise<User | null> {
     try {
-      const { data } = await apolloClient.query({
+      const { data } = await apolloClient.query<{ me: User | null }>({
         query: GET_CURRENT_USER,
         errorPolicy: 'all',
         fetchPolicy: 'network-only',

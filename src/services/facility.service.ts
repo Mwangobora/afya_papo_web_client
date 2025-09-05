@@ -9,13 +9,9 @@ import {
   DISPATCH_AMBULANCE,
   UPDATE_RESOURCE_QUANTITY,
 } from '../graphql/facility.operations';
-import type {
-  Facility,
-  BedManagement,
-  BedStatus,
-  Resource,
-  ApiResponse,
-} from '../types/facility.types';
+import type { Facility, BedManagement, BedStatus } from '../types/facility.types';
+import type { Resource } from '../types/common.types';
+import type { ApiResponse } from '../types/auth.types';
 import { ErrorHandler } from '../utils/error.utils';
 
 interface UpdateBedStatusInput {
@@ -40,7 +36,7 @@ interface UpdateResourceInput {
 export class FacilityService {
   async getFacilityDashboard(facilityId: string): Promise<Facility | null> {
     try {
-      const { data } = await apolloClient.query({
+      const { data } = await apolloClient.query<{ facility: Facility | null }>({
         query: GET_FACILITY_DASHBOARD,
         variables: { facilityId },
         errorPolicy: 'all',
@@ -58,7 +54,9 @@ export class FacilityService {
     input: UpdateBedStatusInput
   ): Promise<ApiResponse<BedManagement>> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        updateBedStatus: { success: boolean; bed?: BedManagement; errors?: string[] };
+      }>({
         mutation: UPDATE_BED_STATUS,
         variables: { input },
         errorPolicy: 'all',
@@ -68,15 +66,17 @@ export class FacilityService {
 
       return {
         success: result?.success || false,
-        data: result?.bed || null,
-        errors: result?.errors || [],
+        data: result?.bed || undefined,
+        errors: (result?.errors ?? []).map((e: any) =>
+          typeof e === 'string' ? { message: e } : e
+        ),
       };
     } catch (error) {
       console.error('Error updating bed status:', error);
       const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        data: null,
+        data: undefined,
         errors,
       };
     }
@@ -86,7 +86,9 @@ export class FacilityService {
     input: DispatchAmbulanceInput
   ): Promise<ApiResponse> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        dispatchAmbulance: { success: boolean; dispatch?: any; errors?: string[] };
+      }>({
         mutation: DISPATCH_AMBULANCE,
         variables: { input },
         errorPolicy: 'all',
@@ -96,15 +98,17 @@ export class FacilityService {
 
       return {
         success: result?.success || false,
-        data: result?.dispatch || null,
-        errors: result?.errors || [],
+        data: result?.dispatch || undefined,
+        errors: (result?.errors ?? []).map((e: any) =>
+          typeof e === 'string' ? { message: e } : e
+        ),
       };
     } catch (error) {
       console.error('Error dispatching ambulance:', error);
       const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        data: null,
+        data: undefined,
         errors,
       };
     }
@@ -114,7 +118,9 @@ export class FacilityService {
     input: UpdateResourceInput
   ): Promise<ApiResponse<Resource>> {
     try {
-      const { data } = await apolloClient.mutate({
+      const { data } = await apolloClient.mutate<{
+        updateResourceQuantity: { success: boolean; resource?: Resource; errors?: string[] };
+      }>({
         mutation: UPDATE_RESOURCE_QUANTITY,
         variables: { input },
         errorPolicy: 'all',
@@ -124,15 +130,17 @@ export class FacilityService {
 
       return {
         success: result?.success || false,
-        data: result?.resource || null,
-        errors: result?.errors || [],
+        data: result?.resource || undefined,
+        errors: (result?.errors ?? []).map((e: any) =>
+          typeof e === 'string' ? { message: e } : e
+        ),
       };
     } catch (error) {
       console.error('Error updating resource quantity:', error);
       const errors = ErrorHandler.handleError(error);
       return {
         success: false,
-        data: null,
+        data: undefined,
         errors,
       };
     }
@@ -143,7 +151,7 @@ export class FacilityService {
     radius?: number
   ): Promise<Facility[]> {
     try {
-      const { data } = await apolloClient.query({
+      const { data } = await apolloClient.query<{ nearbyHospitals: Facility[] }>({
         query: GET_NEARBY_HOSPITALS,
         variables: { location, radius },
         errorPolicy: 'all',
@@ -159,7 +167,7 @@ export class FacilityService {
 
   async getAvailableAmbulances(facilityId: string): Promise<any[]> {
     try {
-      const { data } = await apolloClient.query({
+      const { data } = await apolloClient.query<{ ambulances: any[] }>({
         query: GET_AVAILABLE_AMBULANCES,
         variables: { facilityId },
         errorPolicy: 'all',
@@ -178,7 +186,7 @@ export class FacilityService {
     dateRange?: { startDate: string; endDate: string }
   ): Promise<any> {
     try {
-      const { data } = await apolloClient.query({
+      const { data } = await apolloClient.query<{ facilityAnalytics: any }>({
         query: GET_FACILITY_ANALYTICS,
         variables: { facilityId, dateRange },
         errorPolicy: 'all',

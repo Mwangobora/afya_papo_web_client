@@ -12,6 +12,8 @@ export interface User {
   
   // Profile information
   profile?: UserProfile;
+  hospitalAdminProfile?: HospitalAdminProfile;
+  emergencyResponderProfile?: EmergencyResponderProfile;
   emergencyContacts?: EmergencyContact[];
   
   // Timestamps

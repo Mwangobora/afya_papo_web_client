@@ -2,7 +2,7 @@ import { apolloClient } from '../config/apollo.config';
 import {
   FACILITY_UPDATES,
   INCIDENT_UPDATES,
-  INCOMING_PATIENT_ALERTS,
+  EMERGENCY_ALERTS,
 } from '../graphql/subscriptions';
 import type { 
   FacilityUpdate, 
@@ -111,7 +111,7 @@ export class RealTimeService {
     
     if (!this.subscriptions.has(subscriptionKey)) {
       const subscription = apolloClient.subscribe({
-        query: INCOMING_PATIENT_ALERTS,
+        query: EMERGENCY_ALERTS,
         variables: { facilityId },
       });
 

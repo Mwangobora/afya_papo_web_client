@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { LayoutDashboard,BadgeAlert,CircleUser,Cuboid,Bus,BadgeInfo, ChartPie, CodeSquareIcon, Plug, Menu, GripHorizontalIcon } from "lucide-react";
+import { LayoutDashboard,BadgeAlert,CircleUser,Cuboid,Bus,BadgeInfo, ChartPie, Menu, GripHorizontalIcon } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 
@@ -17,7 +17,8 @@ const navItems: NavItem[] = [
   {
     icon: <LayoutDashboard />,
     name: "Dashboard",
-    path:'/dashboard'
+    path:'/dashboard',
+  
   },
   {
     icon: <BadgeAlert />,
@@ -61,26 +62,8 @@ const othersItems: NavItem[] = [
       { name: "Bar Chart", path: "/bar-chart", pro: false },
     ],
   },
-  {
-    icon: <CodeSquareIcon />,
-    name: "UI Elements",
-    subItems: [
-      { name: "Alerts", path: "/alerts", pro: false },
-      { name: "Avatar", path: "/avatars", pro: false },
-      { name: "Badge", path: "/badge", pro: false },
-      { name: "Buttons", path: "/buttons", pro: false },
-      { name: "Images", path: "/images", pro: false },
-      { name: "Videos", path: "/videos", pro: false },
-    ],
-  },
-  {
-    icon: <Plug />,
-    name: "Authentication",
-    subItems: [
-      { name: "Sign In", path: "/signin", pro: false },
-      { name: "Sign Up", path: "/signup", pro: false },
-    ],
-  },
+ 
+
 ];
 
 const AppSidebar: React.FC = () => {
@@ -239,7 +222,7 @@ const AppSidebar: React.FC = () => {
                       }`}
                     >
                       {subItem.name}
-                      <span className="flex items-center gap-1 ml-auto">
+                      <span className="flex items-center gap-1 ml-auto  dark:text-gray-100">
                         {subItem.new && (
                           <span
                             className={`ml-auto ${
@@ -276,7 +259,7 @@ const AppSidebar: React.FC = () => {
 
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white  dark:text-gray-300 dark:bg-gray-900  dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
         ${
           isExpanded || isMobileOpen
             ? "w-[290px]"
@@ -322,12 +305,12 @@ const AppSidebar: React.FC = () => {
           )}
         </Link>
       </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
+      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar dark:text-gray-300 flex-1">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400  dark:text-gray-200 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"
@@ -343,7 +326,7 @@ const AppSidebar: React.FC = () => {
             </div>
             <div className="">
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400  dark:text-gray-200 ${
                   !isExpanded && !isHovered
                     ? "lg:justify-center"
                     : "justify-start"

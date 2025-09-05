@@ -7,7 +7,7 @@ const Profile: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="p-5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
           <div className="text-sm text-gray-500">Full Name</div>
-          <div className="mt-1 font-medium">John Doe</div>
+          <div className="mt-1 font-medium">Francis  Israel</div>
         </div>
         <div className="p-5 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
           <div className="text-sm text-gray-500">Phone</div>

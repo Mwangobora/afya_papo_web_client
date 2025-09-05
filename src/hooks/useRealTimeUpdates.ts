@@ -3,12 +3,12 @@ import { useSubscription } from '@apollo/client/react';
 import {
   FACILITY_UPDATES,
   INCIDENT_UPDATES,
-  INCOMING_PATIENT_ALERTS,
 } from '../graphql/subscriptions';
 import type { FacilityUpdate, IncidentUpdate } from '../types/common.types';
 
 interface UseRealTimeUpdatesOptions {
   facilityId: string;
+  incidentId?: string;
   onFacilityUpdate?: (update: FacilityUpdate) => void;
   onIncidentUpdate?: (update: IncidentUpdate) => void;
   onPatientAlert?: (alert: any) => void;
@@ -16,27 +16,24 @@ interface UseRealTimeUpdatesOptions {
 
 export const useRealTimeUpdates = ({
   facilityId,
+  incidentId,
   onFacilityUpdate,    
   onIncidentUpdate,
   onPatientAlert,
 }: UseRealTimeUpdatesOptions) => {
   
   // Facility updates subscription
-  const { data: facilityData } = useSubscription(FACILITY_UPDATES, {
+  type FacilityUpdatesResponse = { facilityUpdates: FacilityUpdate };
+  const { data: facilityData } = useSubscription<FacilityUpdatesResponse, { facilityId: string }>(FACILITY_UPDATES, {
     variables: { facilityId },
     skip: !facilityId,
   });
 
   // Incident updates subscription
-  const { data: incidentData } = useSubscription(INCIDENT_UPDATES, {
-    variables: { facilityId },
-    skip: !facilityId,
-  });
-
-  // Patient alerts subscription
-  const { data: patientAlertData } = useSubscription(INCOMING_PATIENT_ALERTS, {
-    variables: { facilityId },
-    skip: !facilityId,
+  type IncidentUpdatesResponse = { incidentUpdates: IncidentUpdate };
+  const { data: incidentData } = useSubscription<IncidentUpdatesResponse, { incidentId: string }>(INCIDENT_UPDATES, {
+    variables: incidentId ? { incidentId } : (undefined as unknown as { incidentId: string }),
+    skip: !incidentId,
   });
 
   const handleFacilityUpdate = useCallback((update: FacilityUpdate) => {
@@ -63,15 +60,9 @@ export const useRealTimeUpdates = ({
     }
   }, [incidentData, handleIncidentUpdate]);
 
-  useEffect(() => {
-    if (patientAlertData?.incomingPatients) {
-      handlePatientAlert(patientAlertData.incomingPatients);
-    }
-  }, [patientAlertData, handlePatientAlert]);
-
   return {
     facilityUpdate: facilityData?.facilityUpdates,
     incidentUpdate: incidentData?.incidentUpdates,
-    patientAlert: patientAlertData?.incomingPatients,
+    patientAlert: undefined,
   };
 };

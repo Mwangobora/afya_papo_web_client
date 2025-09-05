@@ -1,7 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import AppLayout from '../../layout/AppLayout';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -19,8 +18,9 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // User is authenticated; allow rendering children (layout is applied by routes)
+    return <>{children}</>;
   }
 
-  return <AppLayout>{children}</AppLayout>;
+  return <Navigate to="/login" replace />;
 };

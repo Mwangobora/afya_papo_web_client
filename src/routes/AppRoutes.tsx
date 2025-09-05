@@ -156,27 +156,27 @@ export const AppRoutes: React.FC = () => {
         
         <Route
           path="/incidents"
-          element={
-            <ProtectedRoute>
-              <SuspenseWrapper>
-                <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
-                  <Incidents />
-                </RoleBasedRoute>
-              </SuspenseWrapper>
-            </ProtectedRoute>
+          element={      <Incidents />
+            // <ProtectedRoute>
+            //   <SuspenseWrapper>
+            //     <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
+            
+            //     </RoleBasedRoute>
+            //   </SuspenseWrapper>
+            // </ProtectedRoute>
           }
         />
       
       <Route
         path="/incidents/active"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
-                <ActiveIncidents />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
+        element={  <ActiveIncidents />
+          // <ProtectedRoute>
+          //   <SuspenseWrapper>
+          //     <RoleBasedRoute requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER', 'RESPONDER']}>
+               
+          //     </RoleBasedRoute>
+          //   </SuspenseWrapper>
+          // </ProtectedRoute>
         }
       />
       
@@ -209,14 +209,14 @@ export const AppRoutes: React.FC = () => {
       {/* Facility Management Routes */}
       <Route
         path="/facility"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute requiredRole="HOSPITAL_ADMIN">
-                <FacilityDashboard />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
+        element={        <FacilityDashboard />
+          // <ProtectedRoute>
+          //   <SuspenseWrapper>
+          //     <RoleBasedRoute requiredRole="HOSPITAL_ADMIN">
+          //       <FacilityDashboard />
+          //     </RoleBasedRoute>
+          //   </SuspenseWrapper>
+          // </ProtectedRoute>
         }
       />
       
@@ -271,14 +271,14 @@ export const AppRoutes: React.FC = () => {
       {/* Responder Routes */}
       <Route
         path="/responders"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute requiredRole="RESPONDER">
-                <Responders />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
+        element={  <Responders />
+          // <ProtectedRoute>
+          //   <SuspenseWrapper>
+          //     <RoleBasedRoute requiredRole="RESPONDER">
+          //       <Responders />
+          //     </RoleBasedRoute>
+          //   </SuspenseWrapper>
+          // </ProtectedRoute>
         }
       />
       
@@ -311,14 +311,14 @@ export const AppRoutes: React.FC = () => {
       {/* Dispatcher Routes */}
       <Route
         path="/dispatcher"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute requiredRole="DISPATCHER">
-                <Dispatchers />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
+        element={        <Dispatchers />
+          // <ProtectedRoute>
+          //   <SuspenseWrapper>
+          //     <RoleBasedRoute requiredRole="DISPATCHER">
+          //       <Dispatchers />
+          //     </RoleBasedRoute>
+          //   </SuspenseWrapper>
+          // </ProtectedRoute>
         }
       />
       
@@ -357,47 +357,47 @@ export const AppRoutes: React.FC = () => {
       {/* Analytics & Reports Routes */}
       <Route
         path="/analytics"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute 
-                requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER']} 
-                requiredPermission="view_analytics"
-              >
-                <Analytics />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
+        element={ <Analytics />
+          // <ProtectedRoute>
+          //   <SuspenseWrapper>
+          //     <RoleBasedRoute 
+          //       requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER']} 
+          //       requiredPermission="view_analytics"
+          //     >
+          //       <Analytics />
+          //     </RoleBasedRoute>
+          //   </SuspenseWrapper>
+          // </ProtectedRoute>
         }
       />
       
       <Route
         path="/reports"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute 
-                requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER']} 
-                requiredPermission="canGenerateReports"
-              >
-                <Reports />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
+        element={      <Reports />
+          // <ProtectedRoute>
+          //   <SuspenseWrapper>
+          //     <RoleBasedRoute 
+          //       requiredRole={['HOSPITAL_ADMIN', 'DISPATCHER']} 
+          //       requiredPermission="canGenerateReports"
+          //     >
+          //       <Reports />
+          //     </RoleBasedRoute>
+          //   </SuspenseWrapper>
+          // </ProtectedRoute>
         }
       />
       
       {/* Profile & Settings Routes */}
       <Route
         path="/profile"
-        element={
-          <ProtectedRoute>
-            <SuspenseWrapper>
-              <RoleBasedRoute>
-                <Profile />
-              </RoleBasedRoute>
-            </SuspenseWrapper>
-          </ProtectedRoute>
+        element={       <Profile />
+          // <ProtectedRoute>
+          //   <SuspenseWrapper>
+          //     <RoleBasedRoute>
+          //       <Profile />
+          //     </RoleBasedRoute>
+          //   </SuspenseWrapper>
+          // </ProtectedRoute>
         }
       />
       

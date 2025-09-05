@@ -11,9 +11,9 @@ type ResponderRow = Pick<User, 'id'> & {
 };
 
 const mockResponders: ResponderRow[] = [
-  { id: '1', fullName: 'Dr. Jane Doe', phoneNumber: '+255 700 111 222', responderType: 'DOCTOR', verified: true },
-  { id: '2', fullName: 'Nurse John Smith', phoneNumber: '+255 700 333 444', responderType: 'NURSE', verified: false },
-  { id: '3', fullName: 'Paramedic Asha', phoneNumber: '+255 700 555 666', responderType: 'PARAMEDIC', verified: true },
+  { id: '1', fullName: 'Dr. Mwombeki', phoneNumber: '+255 700 111 222', responderType: 'DOCTOR', verified: true },
+  { id: '2', fullName: 'Christa mpina', phoneNumber: '+255 700 333 444', responderType: 'NURSE', verified: false },
+  { id: '3', fullName: 'Paramedic Denis mwaipopo', phoneNumber: '+255 700 555 666', responderType: 'PARAMEDIC', verified: true },
 ];
 
 const Responders: React.FC = () => {
